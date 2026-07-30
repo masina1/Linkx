@@ -24,11 +24,13 @@
 ### Task 1: Pure logic module (`lib/logic.js`) with unit tests
 
 **Files:**
+
 - Create: `linkx/package.json`
 - Create: `linkx/lib/logic.js`
 - Test: `linkx/test/logic.test.js`
 
 **Interfaces:**
+
 - Consumes: nothing (pure, no Chrome/Node APIs).
 - Produces (imported by storage.js, background.js, options.js and the test):
   - `DAYS: string[]` — `['Mon','Tue','Wed','Thu','Fri','Sat','Sun']`
@@ -41,7 +43,7 @@
   - `withDefaults(stored: any): { settings, links }`
   - `Link` shape: `{ id: string, title: string, url: string, days: boolean[], order: number }`
 
-- [ ] **Step 1: Create `linkx/package.json`**
+- [ ] **Step 1: Create** `linkx/package.json`
 
 ```json
 {
@@ -58,70 +60,122 @@
 - [ ] **Step 2: Write the failing test** — create `linkx/test/logic.test.js`
 
 ```js
-import { test } from 'node:test';
-import assert from 'node:assert/strict';
+import { test } from "node:test";
+import assert from "node:assert/strict";
 import {
-  DAYS, DEFAULT_SETTINGS, todayIndex, dayAbbrev, linksForToday,
-  normalizeUrl, emptyDays, everydayDays, weekdayDays, weekendDays, withDefaults,
-} from '../lib/logic.js';
+  DAYS,
+  DEFAULT_SETTINGS,
+  todayIndex,
+  dayAbbrev,
+  linksForToday,
+  normalizeUrl,
+  emptyDays,
+  everydayDays,
+  weekdayDays,
+  weekendDays,
+  withDefaults,
+} from "../lib/logic.js";
 
-test('DAYS is Monday-first', () => {
-  assert.deepEqual(DAYS, ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
+test("DAYS is Monday-first", () => {
+  assert.deepEqual(DAYS, ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
 });
 
-test('todayIndex maps JS Sunday(0) to 6 and Monday(1) to 0', () => {
-  assert.equal(todayIndex(new Date('2026-07-27T12:00:00')), 0); // Monday
-  assert.equal(todayIndex(new Date('2026-07-26T12:00:00')), 6); // Sunday
+test("todayIndex maps JS Sunday(0) to 6 and Monday(1) to 0", () => {
+  assert.equal(todayIndex(new Date("2026-07-27T12:00:00")), 0); // Monday
+  assert.equal(todayIndex(new Date("2026-07-26T12:00:00")), 6); // Sunday
 });
 
-test('dayAbbrev returns the abbreviation', () => {
-  assert.equal(dayAbbrev(3), 'Thu');
+test("dayAbbrev returns the abbreviation", () => {
+  assert.equal(dayAbbrev(3), "Thu");
 });
 
-test('linksForToday filters by day and sorts by order', () => {
+test("linksForToday filters by day and sorts by order", () => {
   const links = [
-    { id: 'a', title: 'A', url: 'https://a', days: [false, true, false, false, false, false, false], order: 2 },
-    { id: 'b', title: 'B', url: 'https://b', days: [false, true, false, false, false, false, false], order: 0 },
-    { id: 'c', title: 'C', url: 'https://c', days: [true, false, false, false, false, false, false], order: 1 },
+    {
+      id: "a",
+      title: "A",
+      url: "https://a",
+      days: [false, true, false, false, false, false, false],
+      order: 2,
+    },
+    {
+      id: "b",
+      title: "B",
+      url: "https://b",
+      days: [false, true, false, false, false, false, false],
+      order: 0,
+    },
+    {
+      id: "c",
+      title: "C",
+      url: "https://c",
+      days: [true, false, false, false, false, false, false],
+      order: 1,
+    },
   ];
   const result = linksForToday(links, 1); // Tuesday
-  assert.deepEqual(result.map((l) => l.id), ['b', 'a']);
+  assert.deepEqual(
+    result.map((l) => l.id),
+    ["b", "a"],
+  );
 });
 
-test('linksForToday returns empty array when nothing matches', () => {
+test("linksForToday returns empty array when nothing matches", () => {
   assert.deepEqual(linksForToday([], 0), []);
 });
 
-test('normalizeUrl prepends https when no scheme', () => {
-  assert.equal(normalizeUrl('example.com'), 'https://example.com/');
+test("normalizeUrl prepends https when no scheme", () => {
+  assert.equal(normalizeUrl("example.com"), "https://example.com/");
 });
 
-test('normalizeUrl keeps existing http(s) scheme', () => {
-  assert.equal(normalizeUrl('http://example.com/x'), 'http://example.com/x');
+test("normalizeUrl keeps existing http(s) scheme", () => {
+  assert.equal(normalizeUrl("http://example.com/x"), "http://example.com/x");
 });
 
-test('normalizeUrl trims whitespace', () => {
-  assert.equal(normalizeUrl('  example.com  '), 'https://example.com/');
+test("normalizeUrl trims whitespace", () => {
+  assert.equal(normalizeUrl("  example.com  "), "https://example.com/");
 });
 
-test('normalizeUrl rejects empty and non-http schemes', () => {
-  assert.equal(normalizeUrl(''), null);
-  assert.equal(normalizeUrl('   '), null);
-  assert.equal(normalizeUrl('ftp://example.com'), null);
+test("normalizeUrl rejects empty and non-http schemes", () => {
+  assert.equal(normalizeUrl(""), null);
+  assert.equal(normalizeUrl("   "), null);
+  assert.equal(normalizeUrl("ftp://example.com"), null);
   assert.equal(normalizeUrl(42), null);
 });
 
-test('day-set helpers', () => {
-  assert.deepEqual(emptyDays(), [false, false, false, false, false, false, false]);
+test("day-set helpers", () => {
+  assert.deepEqual(emptyDays(), [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
   assert.deepEqual(everydayDays(), [true, true, true, true, true, true, true]);
   assert.deepEqual(weekdayDays(), [true, true, true, true, true, false, false]);
-  assert.deepEqual(weekendDays(), [false, false, false, false, false, true, true]);
+  assert.deepEqual(weekendDays(), [
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+  ]);
 });
 
-test('withDefaults fills settings and coerces links', () => {
-  assert.deepEqual(withDefaults(undefined), { settings: DEFAULT_SETTINGS, links: [] });
-  const merged = withDefaults({ settings: { openIn: 'newWindow' }, links: [{ id: 'x' }] });
-  assert.equal(merged.settings.openIn, 'newWindow');
+test("withDefaults fills settings and coerces links", () => {
+  assert.deepEqual(withDefaults(undefined), {
+    settings: DEFAULT_SETTINGS,
+    links: [],
+  });
+  const merged = withDefaults({
+    settings: { openIn: "newWindow" },
+    links: [{ id: "x" }],
+  });
+  assert.equal(merged.settings.openIn, "newWindow");
   assert.equal(merged.settings.showDayBadge, true); // from defaults
   assert.equal(merged.links.length, 1);
 });
@@ -137,10 +191,10 @@ Expected: FAIL — `Cannot find module '../lib/logic.js'` (or import error).
 ```js
 // Pure, dependency-free logic. Safe to import in Node and in the browser.
 
-export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export const DEFAULT_SETTINGS = {
-  openIn: 'newTab',        // 'newTab' | 'newWindow'
+  openIn: "newTab", // 'newTab' | 'newWindow'
   autoOpenOnStartup: false,
   showDayBadge: true,
 };
@@ -162,15 +216,15 @@ export function linksForToday(links, dayIndex) {
 }
 
 export function normalizeUrl(raw) {
-  if (typeof raw !== 'string') return null;
+  if (typeof raw !== "string") return null;
   let s = raw.trim();
   if (!s) return null;
   if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) {
-    s = 'https://' + s;
+    s = "https://" + s;
   }
   try {
     const u = new URL(s);
-    if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+    if (u.protocol !== "http:" && u.protocol !== "https:") return null;
     return u.href;
   } catch {
     return null;
@@ -218,11 +272,13 @@ git commit -m "feat: add pure logic module with unit tests"
 ### Task 2: Manifest + generated icons
 
 **Files:**
+
 - Create: `linkx/manifest.json`
 - Create: `linkx/tools/make-icons.js`
 - Create (generated): `linkx/icons/icon16.png`, `linkx/icons/icon48.png`, `linkx/icons/icon128.png`
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces: a loadable extension shell. `manifest.json` references `background.js`, `options.html`, and the three icon files (created in later/this task). The action has **no** popup, so `chrome.action.onClicked` (Task 4) will fire.
 
@@ -231,13 +287,13 @@ git commit -m "feat: add pure logic module with unit tests"
 ```js
 // Generates simple brand icons (green disc + white ring) as PNGs.
 // Pure Node: uses only zlib + fs. Run: node tools/make-icons.js
-import zlib from 'node:zlib';
-import { writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import zlib from "node:zlib";
+import { writeFileSync, mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT = join(__dirname, '..', 'icons');
+const OUT = join(__dirname, "..", "icons");
 
 const CRC_TABLE = (() => {
   const t = new Uint32Array(256);
@@ -251,12 +307,13 @@ const CRC_TABLE = (() => {
 
 function crc32(buf) {
   let c = 0xffffffff;
-  for (let i = 0; i < buf.length; i++) c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
+  for (let i = 0; i < buf.length; i++)
+    c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
   return (c ^ 0xffffffff) >>> 0;
 }
 
 function chunk(type, data) {
-  const typeBuf = Buffer.from(type, 'ascii');
+  const typeBuf = Buffer.from(type, "ascii");
   const len = Buffer.alloc(4);
   len.writeUInt32BE(data.length, 0);
   const crcBuf = Buffer.alloc(4);
@@ -269,8 +326,8 @@ function encodePNG(size, rgba) {
   const ihdr = Buffer.alloc(13);
   ihdr.writeUInt32BE(size, 0);
   ihdr.writeUInt32BE(size, 4);
-  ihdr[8] = 8;  // bit depth
-  ihdr[9] = 6;  // color type RGBA
+  ihdr[8] = 8; // bit depth
+  ihdr[9] = 6; // color type RGBA
   const stride = size * 4;
   const raw = Buffer.alloc((stride + 1) * size);
   for (let y = 0; y < size; y++) {
@@ -278,7 +335,12 @@ function encodePNG(size, rgba) {
     rgba.copy(raw, y * (stride + 1) + 1, y * stride, y * stride + stride);
   }
   const idat = zlib.deflateSync(raw);
-  return Buffer.concat([sig, chunk('IHDR', ihdr), chunk('IDAT', idat), chunk('IEND', Buffer.alloc(0))]);
+  return Buffer.concat([
+    sig,
+    chunk("IHDR", ihdr),
+    chunk("IDAT", idat),
+    chunk("IEND", Buffer.alloc(0)),
+  ]);
 }
 
 function drawIcon(size) {
@@ -286,16 +348,22 @@ function drawIcon(size) {
   const c = (size - 1) / 2;
   const R = size * 0.46;
   const ringOuter = size * 0.42;
-  const ringInner = size * 0.30;
+  const ringInner = size * 0.3;
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const d = Math.hypot(x - c, y - c);
       const i = (y * size + x) * 4;
       if (d <= R) {
-        rgba[i] = 0x16; rgba[i + 1] = 0xa3; rgba[i + 2] = 0x4a; rgba[i + 3] = 255;
+        rgba[i] = 0x16;
+        rgba[i + 1] = 0xa3;
+        rgba[i + 2] = 0x4a;
+        rgba[i + 3] = 255;
       }
       if (d >= ringInner && d <= ringOuter) {
-        rgba[i] = 255; rgba[i + 1] = 255; rgba[i + 2] = 255; rgba[i + 3] = 255;
+        rgba[i] = 255;
+        rgba[i + 1] = 255;
+        rgba[i + 2] = 255;
+        rgba[i + 3] = 255;
       }
     }
   }
@@ -313,6 +381,7 @@ for (const size of [16, 48, 128]) {
 
 Run: `cd linkx && node tools/make-icons.js`
 Expected output:
+
 ```
 wrote icons/icon16.png
 wrote icons/icon48.png
@@ -322,12 +391,14 @@ wrote icons/icon128.png
 - [ ] **Step 3: Verify the PNGs are valid** (checks the PNG signature bytes)
 
 Run:
+
 ```bash
 cd linkx && node -e "import('node:fs').then(fs=>{for(const s of [16,48,128]){const b=fs.readFileSync('icons/icon'+s+'.png');const ok=b[0]===137&&b[1]===80&&b[2]===78&&b[3]===71;if(!ok)throw new Error('bad png '+s);}console.log('all icons valid');})"
 ```
+
 Expected: `all icons valid`
 
-- [ ] **Step 4: Create `linkx/manifest.json`**
+- [ ] **Step 4: Create** `linkx/manifest.json`
 
 ```json
 {
@@ -378,22 +449,24 @@ git commit -m "feat: add manifest and generated brand icons"
 ### Task 3: Storage wrapper (`lib/storage.js`)
 
 **Files:**
+
 - Create: `linkx/lib/storage.js`
 
 **Interfaces:**
+
 - Consumes: `withDefaults` from `lib/logic.js`.
 - Produces (imported by background.js and options.js):
   - `getConfig(): Promise<{ settings, links }>` — reads key `"linkxConfig"` from `chrome.storage.sync`, falling back to `local`; always returns defaulted shape.
   - `setConfig(config): Promise<{ ok: boolean, fellBack: boolean }>` — writes to `sync`, falling back to `local` on error.
   - `CONFIG_KEY: string` — `"linkxConfig"`.
 
-- [ ] **Step 1: Create `linkx/lib/storage.js`**
+- [ ] **Step 1: Create** `linkx/lib/storage.js`
 
 ```js
 // Thin wrapper over chrome.storage. Tested manually in-browser (no Node mock).
-import { withDefaults } from './logic.js';
+import { withDefaults } from "./logic.js";
 
-export const CONFIG_KEY = 'linkxConfig';
+export const CONFIG_KEY = "linkxConfig";
 
 export async function getConfig() {
   try {
@@ -437,24 +510,26 @@ git commit -m "feat: add chrome.storage wrapper with local fallback"
 ### Task 4: Background service worker (`background.js`)
 
 **Files:**
+
 - Create: `linkx/background.js`
 
 **Interfaces:**
+
 - Consumes: `getConfig` from `lib/storage.js`; `linksForToday`, `todayIndex`, `dayAbbrev` from `lib/logic.js`.
 - Produces: runtime behavior — icon click opens today's links; badge shows the day; startup optionally auto-opens; a daily alarm keeps the badge current.
 
-- [ ] **Step 1: Create `linkx/background.js`**
+- [ ] **Step 1: Create** `linkx/background.js`
 
 ```js
-import { getConfig } from './lib/storage.js';
-import { linksForToday, todayIndex, dayAbbrev } from './lib/logic.js';
+import { getConfig } from "./lib/storage.js";
+import { linksForToday, todayIndex, dayAbbrev } from "./lib/logic.js";
 
-const BADGE_COLOR = '#16a34a';
-const DAILY_ALARM = 'linkx-daily-badge';
+const BADGE_COLOR = "#16a34a";
+const DAILY_ALARM = "linkx-daily-badge";
 
 async function openLinks(urls, openIn) {
   if (!urls.length) return;
-  if (openIn === 'newWindow') {
+  if (openIn === "newWindow") {
     const win = await chrome.windows.create({ url: urls[0] });
     for (const url of urls.slice(1)) {
       await chrome.tabs.create({ windowId: win.id, url }); // sequential = naturally staggered
@@ -478,12 +553,14 @@ async function refreshBadge() {
     await chrome.action.setBadgeText({ text: dayAbbrev(todayIndex()) });
     await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR });
   } else {
-    await chrome.action.setBadgeText({ text: '' });
+    await chrome.action.setBadgeText({ text: "" });
   }
 }
 
 // Toolbar icon click -> open today's links.
-chrome.action.onClicked.addListener(() => { openToday(); });
+chrome.action.onClicked.addListener(() => {
+  openToday();
+});
 
 // Keep the badge in sync.
 chrome.runtime.onInstalled.addListener(() => {
@@ -503,7 +580,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 // When settings change from the options page, update the badge immediately.
-chrome.storage.onChanged.addListener(() => { refreshBadge(); });
+chrome.storage.onChanged.addListener(() => {
+  refreshBadge();
+});
 ```
 
 - [ ] **Step 2: Syntax check**
@@ -530,10 +609,12 @@ git commit -m "feat: add background worker for click, badge, and startup"
 ### Task 5: Options page shell (`options.html` + `options.css`)
 
 **Files:**
+
 - Create: `linkx/options.html`
 - Create: `linkx/options.css`
 
 **Interfaces:**
+
 - Consumes: nothing yet (script wired in Task 6).
 - Produces: the DOM contract that `options.js` (Tasks 6–7) queries by these exact IDs:
   - `#openIn` (select), `#autoOpen` (select), `#showBadge` (select)
@@ -541,81 +622,96 @@ git commit -m "feat: add background worker for click, badge, and startup"
   - `#links-list` (div), `#links-empty` (div)
   - `#bookmarks-tree` (div)
 
-- [ ] **Step 1: Create `linkx/options.html`**
+- [ ] **Step 1: Create** `linkx/options.html`
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Linkx — Settings</title>
-  <link rel="stylesheet" href="options.css" />
-</head>
-<body>
-  <div class="wrap">
-    <header class="head">
-      <h1>Linkx</h1>
-      <p class="sub">Pick the links you want opened for each day. Click the toolbar icon to open today's.</p>
-    </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Linkx — Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="head">
+        <h1>Linkx</h1>
+        <p class="sub">
+          Pick the links you want opened for each day. Click the toolbar icon to
+          open today's.
+        </p>
+      </header>
 
-    <section class="card">
-      <h2>Settings</h2>
-      <div class="settings-grid">
-        <label class="field">
-          <span>Open links in</span>
-          <select id="openIn">
-            <option value="newTab">New Tab</option>
-            <option value="newWindow">New Window</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Auto-open on startup</span>
-          <select id="autoOpen">
-            <option value="no">No</option>
-            <option value="yes">Yes</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Show day badge</span>
-          <select id="showBadge">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </label>
-      </div>
-    </section>
+      <section class="card">
+        <h2>Settings</h2>
+        <div class="settings-grid">
+          <label class="field">
+            <span>Open links in</span>
+            <select id="openIn">
+              <option value="newTab">New Tab</option>
+              <option value="newWindow">New Window</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Auto-open on startup</span>
+            <select id="autoOpen">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Show day badge</span>
+            <select id="showBadge">
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </label>
+        </div>
+      </section>
 
-    <section class="card">
-      <h2>Add a link</h2>
-      <div class="add-row">
-        <input id="add-title" class="input" type="text" placeholder="Title" />
-        <input id="add-url" class="input grow" type="text" placeholder="https://" />
-        <button id="add-btn" class="btn">Add</button>
-      </div>
-      <div id="add-error" class="error" role="alert"></div>
-    </section>
+      <section class="card">
+        <h2>Add a link</h2>
+        <div class="add-row">
+          <input id="add-title" class="input" type="text" placeholder="Title" />
+          <input
+            id="add-url"
+            class="input grow"
+            type="text"
+            placeholder="https://"
+          />
+          <button id="add-btn" class="btn">Add</button>
+        </div>
+        <div id="add-error" class="error" role="alert"></div>
+      </section>
 
-    <section class="card">
-      <h2>Selected links</h2>
-      <p class="hint">Drag the handle or use the arrows to set the order tabs open in. Toggle day pills to choose when each link opens.</p>
-      <div id="links-list" class="links"></div>
-      <div id="links-empty" class="empty">No links yet. Add one above or import from your bookmarks.</div>
-    </section>
+      <section class="card">
+        <h2>Selected links</h2>
+        <p class="hint">
+          Drag the handle or use the arrows to set the order tabs open in.
+          Toggle day pills to choose when each link opens.
+        </p>
+        <div id="links-list" class="links"></div>
+        <div id="links-empty" class="empty">
+          No links yet. Add one above or import from your bookmarks.
+        </div>
+      </section>
 
-    <section class="card">
-      <h2>Import from Chrome bookmarks</h2>
-      <p class="hint">Check a bookmark to add it. Unchecking removes the imported copy.</p>
-      <div id="bookmarks-tree" class="tree"></div>
-    </section>
-  </div>
+      <section class="card">
+        <h2>Import from Chrome bookmarks</h2>
+        <p class="hint">
+          Check a bookmark to add it. Unchecking removes the imported copy.
+        </p>
+        <div id="bookmarks-tree" class="tree"></div>
+      </section>
+    </div>
 
-  <script type="module" src="options.js"></script>
-</body>
+    <script type="module" src="options.js"></script>
+  </body>
 </html>
 ```
 
-- [ ] **Step 2: Create `linkx/options.css`**
+- [ ] **Step 2: Create** `linkx/options.css`
 
 ```css
 :root {
@@ -630,19 +726,36 @@ git commit -m "feat: add background worker for click, badge, and startup"
   --danger: #ef4444;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font:
+    14px/1.5 system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    sans-serif;
 }
 
-.wrap { max-width: 920px; margin: 0 auto; padding: 32px 20px 64px; }
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
 
-.head h1 { margin: 0 0 4px; font-size: 22px; }
-.head .sub { margin: 0 0 8px; color: var(--muted); }
+.head h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+.head .sub {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
 
 .card {
   background: var(--card);
@@ -651,14 +764,33 @@ body {
   padding: 18px 20px;
   margin-top: 18px;
 }
-.card h2 { margin: 0 0 14px; font-size: 15px; }
-.hint { margin: -6px 0 14px; color: var(--muted); font-size: 12px; }
+.card h2 {
+  margin: 0 0 14px;
+  font-size: 15px;
+}
+.hint {
+  margin: -6px 0 14px;
+  color: var(--muted);
+  font-size: 12px;
+}
 
-.settings-grid { display: flex; gap: 18px; flex-wrap: wrap; }
-.field { display: flex; flex-direction: column; gap: 6px; }
-.field span { color: var(--muted); font-size: 12px; }
+.settings-grid {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field span {
+  color: var(--muted);
+  font-size: 12px;
+}
 
-select, .input {
+select,
+.input {
   background: var(--card-2);
   color: var(--text);
   border: 1px solid var(--border);
@@ -666,10 +798,18 @@ select, .input {
   padding: 8px 10px;
   font: inherit;
 }
-select { min-width: 150px; }
-.input.grow { flex: 1; }
+select {
+  min-width: 150px;
+}
+.input.grow {
+  flex: 1;
+}
 
-.add-row { display: flex; gap: 10px; align-items: center; }
+.add-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
 .btn {
   background: var(--brand);
@@ -680,13 +820,27 @@ select { min-width: 150px; }
   font: inherit;
   cursor: pointer;
 }
-.btn:hover { filter: brightness(1.08); }
+.btn:hover {
+  filter: brightness(1.08);
+}
 
-.error { color: var(--danger); font-size: 12px; min-height: 16px; margin-top: 8px; }
+.error {
+  color: var(--danger);
+  font-size: 12px;
+  min-height: 16px;
+  margin-top: 8px;
+}
 
-.empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
+.empty {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 8px 0;
+}
 
-.links { display: flex; flex-direction: column; }
+.links {
+  display: flex;
+  flex-direction: column;
+}
 
 .link-row {
   display: flex;
@@ -695,14 +849,32 @@ select { min-width: 150px; }
   padding: 10px 0;
   border-top: 1px solid var(--border);
 }
-.link-row:first-child { border-top: 0; }
-
-.handle { cursor: grab; color: var(--muted); user-select: none; padding: 0 2px; }
-.arrows { display: flex; flex-direction: column; line-height: 1; }
-.arrows button {
-  background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 11px; padding: 0;
+.link-row:first-child {
+  border-top: 0;
 }
-.arrows button:hover { color: var(--text); }
+
+.handle {
+  cursor: grab;
+  color: var(--muted);
+  user-select: none;
+  padding: 0 2px;
+}
+.arrows {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+.arrows button {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0;
+}
+.arrows button:hover {
+  color: var(--text);
+}
 
 .title-input {
   background: transparent;
@@ -713,9 +885,17 @@ select { min-width: 150px; }
   padding: 5px 6px;
   width: 200px;
 }
-.title-input:hover, .title-input:focus { border-color: var(--border); outline: none; }
+.title-input:hover,
+.title-input:focus {
+  border-color: var(--border);
+  outline: none;
+}
 
-.pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
 .pill {
   background: var(--card-2);
   color: var(--muted);
@@ -725,22 +905,67 @@ select { min-width: 150px; }
   font-size: 12px;
   cursor: pointer;
 }
-.pill.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+.pill.on {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
 
-.shortcuts { display: flex; gap: 10px; margin-left: auto; }
-.shortcut { background: none; border: 0; color: var(--muted); font-size: 12px; cursor: pointer; }
-.shortcut:hover { color: var(--text); }
+.shortcuts {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+.shortcut {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.shortcut:hover {
+  color: var(--text);
+}
 
-.del { background: none; border: 0; color: var(--muted); font-size: 16px; cursor: pointer; }
-.del:hover { color: var(--danger); }
+.del {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+}
+.del:hover {
+  color: var(--danger);
+}
 
-.link-row.drag-over { border-top: 2px solid var(--brand); }
+.link-row.drag-over {
+  border-top: 2px solid var(--brand);
+}
 
-.tree { display: flex; flex-direction: column; gap: 2px; }
-.tree details { margin-left: 6px; }
-.tree summary { cursor: pointer; color: var(--text); padding: 3px 0; }
-.bm-item { display: flex; align-items: center; gap: 8px; margin-left: 20px; padding: 2px 0; color: var(--muted); }
-.bm-item input { accent-color: var(--brand); }
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tree details {
+  margin-left: 6px;
+}
+.tree summary {
+  cursor: pointer;
+  color: var(--text);
+  padding: 3px 0;
+}
+.bm-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 20px;
+  padding: 2px 0;
+  color: var(--muted);
+}
+.bm-item input {
+  accent-color: var(--brand);
+}
 ```
 
 - [ ] **Step 3: Manually verify layout**
@@ -760,19 +985,26 @@ git commit -m "feat: add options page shell and dark theme"
 ### Task 6: Options logic — settings, add link, list, day pills, reorder, delete (`options.js`)
 
 **Files:**
+
 - Create: `linkx/options.js`
 
 **Interfaces:**
+
 - Consumes: `getConfig`, `setConfig` from `lib/storage.js`; `DAYS`, `normalizeUrl`, `emptyDays`, `everydayDays`, `weekdayDays`, `weekendDays` from `lib/logic.js`; the DOM IDs from Task 5.
 - Produces (internal functions Task 7 will call): a module-level `config` object `{ settings, links }`; `save()`; `renderLinks()`; `reindex()`; `addLinkFromBookmark(title, url)`; `removeLinkByUrl(url)`. `crypto.randomUUID()` is used for link ids.
 
-- [ ] **Step 1: Create `linkx/options.js`**
+- [ ] **Step 1: Create** `linkx/options.js`
 
 ```js
-import { getConfig, setConfig } from './lib/storage.js';
+import { getConfig, setConfig } from "./lib/storage.js";
 import {
-  DAYS, normalizeUrl, emptyDays, everydayDays, weekdayDays, weekendDays,
-} from './lib/logic.js';
+  DAYS,
+  normalizeUrl,
+  emptyDays,
+  everydayDays,
+  weekdayDays,
+  weekendDays,
+} from "./lib/logic.js";
 
 let config = { settings: {}, links: [] };
 let dragFrom = null;
@@ -784,44 +1016,51 @@ async function save() {
 }
 
 function reindex() {
-  config.links.forEach((l, i) => { l.order = i; });
+  config.links.forEach((l, i) => {
+    l.order = i;
+  });
 }
 
 // ---- Settings ----
 
 function renderSettings() {
-  $('openIn').value = config.settings.openIn;
-  $('autoOpen').value = config.settings.autoOpenOnStartup ? 'yes' : 'no';
-  $('showBadge').value = config.settings.showDayBadge ? 'yes' : 'no';
+  $("openIn").value = config.settings.openIn;
+  $("autoOpen").value = config.settings.autoOpenOnStartup ? "yes" : "no";
+  $("showBadge").value = config.settings.showDayBadge ? "yes" : "no";
 }
 
 function wireSettings() {
-  $('openIn').addEventListener('change', (e) => {
-    config.settings.openIn = e.target.value; save();
+  $("openIn").addEventListener("change", (e) => {
+    config.settings.openIn = e.target.value;
+    save();
   });
-  $('autoOpen').addEventListener('change', (e) => {
-    config.settings.autoOpenOnStartup = e.target.value === 'yes'; save();
+  $("autoOpen").addEventListener("change", (e) => {
+    config.settings.autoOpenOnStartup = e.target.value === "yes";
+    save();
   });
-  $('showBadge').addEventListener('change', (e) => {
-    config.settings.showDayBadge = e.target.value === 'yes'; save();
+  $("showBadge").addEventListener("change", (e) => {
+    config.settings.showDayBadge = e.target.value === "yes";
+    save();
   });
 }
 
 // ---- Add link ----
 
 function wireAdd() {
-  $('add-btn').addEventListener('click', onAdd);
-  $('add-url').addEventListener('keydown', (e) => { if (e.key === 'Enter') onAdd(); });
+  $("add-btn").addEventListener("click", onAdd);
+  $("add-url").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") onAdd();
+  });
 }
 
 function onAdd() {
-  const title = $('add-title').value.trim();
-  const url = normalizeUrl($('add-url').value);
+  const title = $("add-title").value.trim();
+  const url = normalizeUrl($("add-url").value);
   if (!url) {
-    $('add-error').textContent = 'Enter a valid URL.';
+    $("add-error").textContent = "Enter a valid URL.";
     return;
   }
-  $('add-error').textContent = '';
+  $("add-error").textContent = "";
   config.links.push({
     id: crypto.randomUUID(),
     title: title || url,
@@ -832,16 +1071,16 @@ function onAdd() {
   reindex();
   save();
   renderLinks();
-  $('add-title').value = '';
-  $('add-url').value = '';
+  $("add-title").value = "";
+  $("add-url").value = "";
 }
 
 // ---- Links list ----
 
 function renderLinks() {
-  const list = $('links-list');
-  list.innerHTML = '';
-  $('links-empty').style.display = config.links.length ? 'none' : 'block';
+  const list = $("links-list");
+  list.innerHTML = "";
+  $("links-empty").style.display = config.links.length ? "none" : "block";
 
   config.links.forEach((link, index) => {
     list.appendChild(renderRow(link, index));
@@ -849,48 +1088,53 @@ function renderLinks() {
 }
 
 function renderRow(link, index) {
-  const row = document.createElement('div');
-  row.className = 'link-row';
+  const row = document.createElement("div");
+  row.className = "link-row";
   row.dataset.index = String(index);
 
   // Handle (drag source)
-  const handle = document.createElement('span');
-  handle.className = 'handle';
-  handle.textContent = '⠿';
+  const handle = document.createElement("span");
+  handle.className = "handle";
+  handle.textContent = "⠿";
   handle.draggable = true;
-  handle.addEventListener('dragstart', () => { dragFrom = index; });
+  handle.addEventListener("dragstart", () => {
+    dragFrom = index;
+  });
   row.appendChild(handle);
 
   // Up/down arrows
-  const arrows = document.createElement('div');
-  arrows.className = 'arrows';
-  const up = document.createElement('button');
-  up.textContent = '▲';
-  up.title = 'Move up';
-  up.addEventListener('click', () => moveLink(index, index - 1));
-  const down = document.createElement('button');
-  down.textContent = '▼';
-  down.title = 'Move down';
-  down.addEventListener('click', () => moveLink(index, index + 1));
+  const arrows = document.createElement("div");
+  arrows.className = "arrows";
+  const up = document.createElement("button");
+  up.textContent = "▲";
+  up.title = "Move up";
+  up.addEventListener("click", () => moveLink(index, index - 1));
+  const down = document.createElement("button");
+  down.textContent = "▼";
+  down.title = "Move down";
+  down.addEventListener("click", () => moveLink(index, index + 1));
   arrows.append(up, down);
   row.appendChild(arrows);
 
   // Title (editable input)
-  const title = document.createElement('input');
-  title.className = 'title-input';
-  title.type = 'text';
+  const title = document.createElement("input");
+  title.className = "title-input";
+  title.type = "text";
   title.value = link.title;
-  title.addEventListener('change', () => { link.title = title.value.trim() || link.url; save(); });
+  title.addEventListener("change", () => {
+    link.title = title.value.trim() || link.url;
+    save();
+  });
   row.appendChild(title);
 
   // Day pills
-  const pills = document.createElement('div');
-  pills.className = 'pills';
+  const pills = document.createElement("div");
+  pills.className = "pills";
   DAYS.forEach((label, dayIdx) => {
-    const pill = document.createElement('button');
-    pill.className = 'pill' + (link.days[dayIdx] ? ' on' : '');
+    const pill = document.createElement("button");
+    pill.className = "pill" + (link.days[dayIdx] ? " on" : "");
     pill.textContent = label;
-    pill.addEventListener('click', () => {
+    pill.addEventListener("click", () => {
       link.days = link.days.slice();
       link.days[dayIdx] = !link.days[dayIdx];
       save();
@@ -901,27 +1145,31 @@ function renderRow(link, index) {
   row.appendChild(pills);
 
   // Quick shortcuts
-  const shortcuts = document.createElement('div');
-  shortcuts.className = 'shortcuts';
+  const shortcuts = document.createElement("div");
+  shortcuts.className = "shortcuts";
   const addShortcut = (label, fn) => {
-    const b = document.createElement('button');
-    b.className = 'shortcut';
+    const b = document.createElement("button");
+    b.className = "shortcut";
     b.textContent = label;
-    b.addEventListener('click', () => { link.days = fn(); save(); renderLinks(); });
+    b.addEventListener("click", () => {
+      link.days = fn();
+      save();
+      renderLinks();
+    });
     shortcuts.appendChild(b);
   };
-  addShortcut('Everyday', everydayDays);
-  addShortcut('Weekdays', weekdayDays);
-  addShortcut('Weekends', weekendDays);
-  addShortcut('Clear', emptyDays);
+  addShortcut("Everyday", everydayDays);
+  addShortcut("Weekdays", weekdayDays);
+  addShortcut("Weekends", weekendDays);
+  addShortcut("Clear", emptyDays);
   row.appendChild(shortcuts);
 
   // Delete
-  const del = document.createElement('button');
-  del.className = 'del';
-  del.textContent = '✕';
-  del.title = 'Remove link';
-  del.addEventListener('click', () => {
+  const del = document.createElement("button");
+  del.className = "del";
+  del.textContent = "✕";
+  del.title = "Remove link";
+  del.addEventListener("click", () => {
     config.links = config.links.filter((l) => l.id !== link.id);
     reindex();
     save();
@@ -930,11 +1178,14 @@ function renderRow(link, index) {
   row.appendChild(del);
 
   // Drop target behavior
-  row.addEventListener('dragover', (e) => { e.preventDefault(); row.classList.add('drag-over'); });
-  row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
-  row.addEventListener('drop', (e) => {
+  row.addEventListener("dragover", (e) => {
     e.preventDefault();
-    row.classList.remove('drag-over');
+    row.classList.add("drag-over");
+  });
+  row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
+  row.addEventListener("drop", (e) => {
+    e.preventDefault();
+    row.classList.remove("drag-over");
     if (dragFrom !== null && dragFrom !== index) moveLink(dragFrom, index);
     dragFrom = null;
   });
@@ -987,7 +1238,14 @@ async function init() {
 
 init();
 
-export { config, save, reindex, renderLinks, addLinkFromBookmark, removeLinkByUrl };
+export {
+  config,
+  save,
+  reindex,
+  renderLinks,
+  addLinkFromBookmark,
+  removeLinkByUrl,
+};
 ```
 
 - [ ] **Step 2: Syntax check**
@@ -1017,34 +1275,36 @@ git commit -m "feat: add options logic for links, days, reorder, and settings"
 ### Task 7: Bookmark import tree (`options.js`)
 
 **Files:**
+
 - Modify: `linkx/options.js` (add bookmark-tree rendering and wire it into `init`)
 
 **Interfaces:**
+
 - Consumes: `chrome.bookmarks.getTree`; existing `config`, `addLinkFromBookmark`, `removeLinkByUrl`, `renderLinks` from Task 6; `#bookmarks-tree` from Task 5.
 - Produces: an expandable bookmark tree whose checkboxes add/remove links. Also re-checks the tree state after list changes.
 
-- [ ] **Step 1: Add bookmark functions to `linkx/options.js`** — insert these functions just above the `// ---- Init ----` comment
+- [ ] **Step 1: Add bookmark functions to** `linkx/options.js` — insert these functions just above the `// ---- Init ----` comment
 
 ```js
 // ---- Bookmark import ----
 
 function renderBookmarkNode(node) {
   if (node.url) {
-    const label = document.createElement('label');
-    label.className = 'bm-item';
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
+    const label = document.createElement("label");
+    label.className = "bm-item";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
     cb.checked = config.links.some((l) => l.url === node.url);
-    cb.addEventListener('change', () => {
+    cb.addEventListener("change", () => {
       if (cb.checked) addLinkFromBookmark(node.title, node.url);
       else removeLinkByUrl(node.url);
     });
-    label.append(cb, document.createTextNode(' ' + (node.title || node.url)));
+    label.append(cb, document.createTextNode(" " + (node.title || node.url)));
     return label;
   }
-  const details = document.createElement('details');
-  const summary = document.createElement('summary');
-  summary.textContent = node.title || '(folder)';
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = node.title || "(folder)";
   details.appendChild(summary);
   for (const child of node.children || []) {
     details.appendChild(renderBookmarkNode(child));
@@ -1053,8 +1313,8 @@ function renderBookmarkNode(node) {
 }
 
 async function renderBookmarks() {
-  const container = $('bookmarks-tree');
-  container.innerHTML = '';
+  const container = $("bookmarks-tree");
+  container.innerHTML = "";
   const tree = await chrome.bookmarks.getTree();
   const roots = (tree[0] && tree[0].children) || [];
   for (const root of roots) {
@@ -1063,15 +1323,18 @@ async function renderBookmarks() {
 }
 ```
 
-- [ ] **Step 2: Call `renderBookmarks()` from `init`** — in `options.js`, change the end of the `init` function.
+- [ ] **Step 2: Call** `renderBookmarks()` **from** `init` — in `options.js`, change the end of the `init` function.
 
 Replace:
+
 ```js
   wireAdd();
   renderLinks();
 }
 ```
+
 With:
+
 ```js
   wireAdd();
   renderLinks();
@@ -1082,11 +1345,12 @@ With:
 - [ ] **Step 3: Re-sync tree checkboxes after list edits** — so deleting a link in the list un-checks it in the tree. In `options.js`, update `renderLinks` to refresh the tree checkboxes without collapsing folders.
 
 Replace the whole `renderLinks` function with:
+
 ```js
 function renderLinks() {
-  const list = $('links-list');
-  list.innerHTML = '';
-  $('links-empty').style.display = config.links.length ? 'none' : 'block';
+  const list = $("links-list");
+  list.innerHTML = "";
+  $("links-empty").style.display = config.links.length ? "none" : "block";
 
   config.links.forEach((link, index) => {
     list.appendChild(renderRow(link, index));
@@ -1097,24 +1361,29 @@ function renderLinks() {
 
 function syncBookmarkChecks() {
   const urls = new Set(config.links.map((l) => l.url));
-  document.querySelectorAll('#bookmarks-tree input[type="checkbox"]').forEach((cb) => {
-    cb.checked = urls.has(cb.dataset.url);
-  });
+  document
+    .querySelectorAll('#bookmarks-tree input[type="checkbox"]')
+    .forEach((cb) => {
+      cb.checked = urls.has(cb.dataset.url);
+    });
 }
 ```
 
 - [ ] **Step 4: Tag each checkbox with its URL** — in `renderBookmarkNode`, so `syncBookmarkChecks` can match. Replace:
+
 ```js
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = config.links.some((l) => l.url === node.url);
+const cb = document.createElement("input");
+cb.type = "checkbox";
+cb.checked = config.links.some((l) => l.url === node.url);
 ```
+
 With:
+
 ```js
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.dataset.url = node.url;
-    cb.checked = config.links.some((l) => l.url === node.url);
+const cb = document.createElement("input");
+cb.type = "checkbox";
+cb.dataset.url = node.url;
+cb.checked = config.links.some((l) => l.url === node.url);
 ```
 
 - [ ] **Step 5: Syntax check**
