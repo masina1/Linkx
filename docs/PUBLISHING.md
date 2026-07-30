@@ -24,7 +24,7 @@ powershell -ExecutionPolicy Bypass -File tools\pack.ps1
 
 This reads the version from `manifest.json` and writes `linkx-<version>.zip` (e.g. `linkx-1.0.3.zip`) containing exactly the shipping files, with `manifest.json`, `lib/`, and `icons/` at the root.
 
-> **Why a script and not `Compress-Archive`?** Windows PowerShell 5.1's `Compress-Archive` (and `ZipFile.CreateFromDirectory`) write ZIP entry names with **backslashes** (`lib\logic.js`), but the ZIP spec requires forward slashes. Chrome would then treat the file as literally named `lib\logic.js` at the root, breaking the `import './lib/storage.js'` calls after install. `tools/pack.ps1` builds entries with explicit forward slashes to avoid this.
+> **Why a script and not** `Compress-Archive`**?** Windows PowerShell 5.1's `Compress-Archive` (and `ZipFile.CreateFromDirectory`) write ZIP entry names with **backslashes** (`lib\logic.js`), but the ZIP spec requires forward slashes. Chrome would then treat the file as literally named `lib\logic.js` at the root, breaking the `import './lib/storage.js'` calls after install. `tools/pack.ps1` builds entries with explicit forward slashes to avoid this.
 
 > Every store update needs a **higher version** than the last published one. We already bump `version` in `manifest.json` + `package.json` on each change, so just re-run the script.
 
@@ -52,6 +52,7 @@ $z.Entries.FullName; $z.Dispose()
 **Name:** `Linkx`
 
 **Summary** (≤ 132 characters):
+
 ```
 Open the bookmarks you've chosen for today's weekday with a single click.
 ```
@@ -61,6 +62,7 @@ Open the bookmarks you've chosen for today's weekday with a single click.
 **Language:** English (or your preference)
 
 **Description:**
+
 ```
 Linkx opens the links you care about for the current day of the week — in one click.
 
@@ -81,6 +83,7 @@ Linkx is free and open source, licensed under CC BY-NC 4.0.
 ```
 
 **Graphic assets** (prepare these — **[you]**):
+
 - **Store icon:** 128×128 PNG. Linkx already ships `icons/icon128.png`; you can reuse it.
 - **Screenshots:** at least **1** (up to 5). **1280×800** or 640×400 PNG/JPEG. Load the extension, open its **Options** page with a few links configured and day pills toggled, and capture it. A second shot of the toolbar icon opening tabs is a nice-to-have.
 - **Small promo tile** (optional): 440×280 PNG.
@@ -90,28 +93,31 @@ Linkx is free and open source, licensed under CC BY-NC 4.0.
 ## 5. Privacy practices tab
 
 **Single purpose** (paste):
+
 ```
 Linkx opens the bookmarks the user has chosen for the current weekday when they click the toolbar icon.
 ```
 
 **Permission justifications** (one per requested permission):
 
-| Permission | Justification |
-|---|---|
+| Permission  | Justification                                                                                                                                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `bookmarks` | Read the user's existing Chrome bookmarks to display them on the options page so the user can select which ones to add as daily links. Bookmarks are read only for display; they are never modified or transmitted. |
-| `storage` | Save the user's link list and settings so they persist and sync across the user's own signed-in Chrome profiles. |
-| `tabs` | Open the user's selected links in new tabs or a new window when they click the toolbar icon or on startup. |
-| `alarms` | Refresh the toolbar day badge periodically so it always shows the correct current weekday. |
+| `storage`   | Save the user's link list and settings so they persist and sync across the user's own signed-in Chrome profiles.                                                                                                    |
+| `tabs`      | Open the user's selected links in new tabs or a new window when they click the toolbar icon or on startup.                                                                                                          |
+| `alarms`    | Refresh the toolbar day badge periodically so it always shows the correct current weekday.                                                                                                                          |
 
-> **Reviewer note on `tabs`:** creating tabs (`chrome.tabs.create`) does **not** strictly require the `tabs` permission — that permission only grants access to sensitive tab properties (URL, title) which Linkx doesn't read. If a reviewer flags `tabs` as unnecessary, you can safely remove `"tabs"` from `manifest.json` and resubmit; the open-links feature will still work. It's currently declared for clarity.
+> **Reviewer note on** `tabs`**:** creating tabs (`chrome.tabs.create`) does **not** strictly require the `tabs` permission — that permission only grants access to sensitive tab properties (URL, title) which Linkx doesn't read. If a reviewer flags `tabs` as unnecessary, you can safely remove `"tabs"` from `manifest.json` and resubmit; the open-links feature will still work. It's currently declared for clarity.
 
 **Data usage** — declare and certify:
+
 - Linkx does **not** collect or use user data (no data leaves the device).
 - ✅ I do not sell or transfer user data to third parties (outside approved use cases).
 - ✅ I do not use or transfer user data for purposes unrelated to the item's single purpose.
 - ✅ I do not use or transfer user data to determine creditworthiness or for lending.
 
 **Privacy policy URL** (required because Linkx uses `bookmarks`/`tabs`): host `PRIVACY.md` and paste its URL. Easiest options:
+
 - **GitHub raw:** `https://raw.githubusercontent.com/masina1/Linkx/master/PRIVACY.md`
 - Or enable **GitHub Pages** on the repo and link the rendered page.
 
@@ -138,9 +144,9 @@ Click **Submit for review**. Review typically takes anywhere from a few hours to
 
 ## Pre-submit checklist
 
-- [ ] `cd linkx && node --test` passes
-- [ ] Version in `manifest.json` is higher than the last published version
-- [ ] ZIP has `manifest.json` at its root (no extra wrapping folder)
-- [ ] At least one 1280×800 screenshot prepared
-- [ ] `PRIVACY.md` is hosted and the URL works
-- [ ] Permission justifications filled in
+- [x] `cd linkx && node --test` passes
+- [x] Version in `manifest.json` is higher than the last published version
+- [x] ZIP has `manifest.json` at its root (no extra wrapping folder)
+- [x] At least one 1280×800 screenshot prepared
+- [x] `PRIVACY.md` is hosted and the URL works
+- [x] Permission justifications filled in
