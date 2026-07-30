@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #0b0f14; }
+  .stage {
+    width: 1280px; height: 800px;
+    background:
+      radial-gradient(720px 560px at 82% 22%, rgba(22,163,74,0.16), transparent 60%),
+      #0b0f14;
+    color: #e6edf3;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center; gap: 40px;
+    padding: 72px 80px;
+  }
+
+  /* ---- left: message ---- */
+  .brand { display: flex; align-items: center; gap: 14px; margin-bottom: 34px; }
+  .brand .word { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; }
+  .brand .word .x { color: #16a34a; }
+
+  h1 { font-size: 66px; line-height: 1.02; font-weight: 800; letter-spacing: -0.03em; }
+  h1 .accent { color: #16a34a; }
+  .sub { margin-top: 22px; font-size: 24px; line-height: 1.45; color: #8b98a5; max-width: 30ch; }
+
+  .points { margin-top: 40px; display: flex; flex-direction: column; gap: 18px; }
+  .point { display: flex; align-items: center; gap: 14px; font-size: 21px; }
+  .dot { width: 26px; height: 26px; border-radius: 50%; background: #12331f; border: 1px solid #16a34a;
+         display: grid; place-items: center; color: #16a34a; font-size: 15px; font-weight: 800; flex: none; }
+  .point b { font-weight: 700; }
+  .point span { color: #8b98a5; }
+
+  /* ---- right: app-like card ---- */
+  .panel { justify-self: end; width: 100%; max-width: 520px; }
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; color: #8b98a5; font-size: 15px; }
+  .icon-badge { position: relative; width: 44px; height: 44px; }
+  .icon-badge .badge {
+    position: absolute; right: -6px; bottom: -6px; background: #16a34a; color: #fff;
+    font-size: 12px; font-weight: 800; padding: 2px 6px; border-radius: 6px; border: 2px solid #0b0f14;
+  }
+  .card {
+    background: #121821; border: 1px solid #1e2733; border-radius: 16px; padding: 22px 22px 8px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  }
+  .card h2 { font-size: 15px; color: #e6edf3; margin-bottom: 6px; }
+  .card .hint { font-size: 12px; color: #8b98a5; margin-bottom: 8px; }
+  .link { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid #1e2733; }
+  .link:first-of-type { border-top: 0; }
+  .handle { color: #55606b; font-size: 15px; }
+  .name { width: 118px; font-size: 15px; font-weight: 600; }
+  .pills { display: flex; gap: 6px; }
+  .pill {
+    border: 1px solid #1e2733; background: #0e141c; color: #8b98a5;
+    border-radius: 999px; padding: 5px 11px; font-size: 12.5px; font-weight: 600;
+  }
+  .pill.on { background: #16a34a; border-color: #16a34a; color: #fff; }
+  .foot { margin-top: 26px; font-size: 15px; color: #55606b; }
+  .foot b { color: #8b98a5; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <!-- left -->
+    <div>
+      <div class="brand">
+        <svg viewBox="0 0 100 100" width="40" height="40" aria-hidden="true">
+          <circle cx="50" cy="50" r="46" fill="#16a34a"/>
+          <circle cx="50" cy="50" r="42" fill="#ffffff"/>
+          <circle cx="50" cy="50" r="30" fill="#16a34a"/>
+        </svg>
+        <span class="word">Link<span class="x">x</span></span>
+      </div>
+
+      <h1>The right tabs,<br>for the <span class="accent">right day</span>.</h1>
+      <p class="sub">Pick which bookmarks open on each weekday. Click once — Linkx opens today's set.</p>
+
+      <div class="points">
+        <div class="point"><span class="dot">✓</span><div><b>Per-day scheduling</b> — <span>assign links to any days, Mon–Sun</span></div></div>
+        <div class="point"><span class="dot">✓</span><div><b>One-click open</b> — <span>today's links, in your order</span></div></div>
+        <div class="point"><span class="dot">✓</span><div><b>Import bookmarks</b> — <span>pull straight from Chrome</span></div></div>
+      </div>
+    </div>
+
+    <!-- right -->
+    <div class="panel">
+      <div class="toolbar">
+        <span class="icon-badge">
+          <svg viewBox="0 0 100 100" width="44" height="44" aria-hidden="true">
+            <circle cx="50" cy="50" r="46" fill="#16a34a"/>
+            <circle cx="50" cy="50" r="42" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="30" fill="#16a34a"/>
+          </svg>
+          <span class="badge">Thu</span>
+        </span>
+        <span>the toolbar shows today — click to open</span>
+      </div>
+
+      <div class="card">
+        <h2>Selected links</h2>
+        <div class="hint">Toggle day pills to choose when each link opens.</div>
+
+        <div class="link">
+          <span class="handle">⠿</span>
+          <span class="name">Gmail</span>
+          <span class="pills">
+            <span class="pill on">Mon</span><span class="pill">Tue</span><span class="pill on">Wed</span>
+            <span class="pill on">Thu</span><span class="pill on">Fri</span><span class="pill">Sat</span><span class="pill">Sun</span>
+          </span>
+        </div>
+        <div class="link">
+          <span class="handle">⠿</span>
+          <span class="name">Calendar</span>
+          <span class="pills">
+            <span class="pill on">Mon</span><span class="pill on">Tue</span><span class="pill on">Wed</span>
+            <span class="pill on">Thu</span><span class="pill on">Fri</span><span class="pill">Sat</span><span class="pill">Sun</span>
+          </span>
+        </div>
+        <div class="link">
+          <span class="handle">⠿</span>
+          <span class="name">Fitness log</span>
+          <span class="pills">
+            <span class="pill">Mon</span><span class="pill">Tue</span><span class="pill">Wed</span>
+            <span class="pill">Thu</span><span class="pill">Fri</span><span class="pill on">Sat</span><span class="pill on">Sun</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="foot"><b>Free & open source</b> · CC BY-NC 4.0 · no accounts, no tracking</div>
+    </div>
+  </div>
+</body>
+</html>

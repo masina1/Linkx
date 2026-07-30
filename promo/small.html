@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #0b0f14; }
+  .stage {
+    width: 440px; height: 280px;
+    background:
+      radial-gradient(320px 260px at 50% 38%, rgba(22,163,74,0.22), transparent 62%),
+      #0b0f14;
+    color: #e6edf3;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px;
+  }
+  .mark { filter: drop-shadow(0 6px 22px rgba(22,163,74,0.4)); }
+  .word { font-size: 52px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+  .word .x { color: #16a34a; }
+  .tag { font-size: 16px; color: #8b98a5; letter-spacing: -0.01em; }
+  .week { display: flex; gap: 9px; margin-top: 6px; }
+  .d { width: 12px; height: 12px; border-radius: 50%; background: #16233047; border: 1px solid #1e2733; }
+  .d.on { background: #16a34a; border-color: #16a34a; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <svg class="mark" viewBox="0 0 100 100" width="88" height="88" aria-hidden="true">
+      <circle cx="50" cy="50" r="46" fill="#16a34a"/>
+      <circle cx="50" cy="50" r="42" fill="#ffffff"/>
+      <circle cx="50" cy="50" r="30" fill="#16a34a"/>
+    </svg>
+    <div class="word">Link<span class="x">x</span></div>
+    <div class="tag">Today's links, one click.</div>
+    <div class="week">
+      <span class="d on"></span><span class="d"></span><span class="d on"></span>
+      <span class="d"></span><span class="d on"></span><span class="d"></span><span class="d"></span>
+    </div>
+  </div>
+</body>
+</html>
