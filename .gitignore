@@ -4,3 +4,7 @@ node_modules/
 # Build artifacts (Chrome Web Store packages)
 dist/
 *.zip
+
+# Packed extension + PRIVATE signing key — never commit these
+*.crx
+*.pem
