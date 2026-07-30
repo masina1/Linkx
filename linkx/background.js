@@ -35,7 +35,7 @@ async function refreshBadge() {
 }
 
 // Toolbar icon click -> open today's links.
-chrome.action.onClicked.addListener(() => { openToday(); });
+chrome.action.onClicked.addListener(() => { openToday().catch(console.error); });
 
 // Keep the badge in sync.
 chrome.runtime.onInstalled.addListener(() => {
@@ -45,9 +45,10 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onStartup.addListener(async () => {
   await refreshBadge();
-  chrome.alarms.create(DAILY_ALARM, { periodInMinutes: 60 });
+  const existing = await chrome.alarms.get(DAILY_ALARM);
+  if (!existing) chrome.alarms.create(DAILY_ALARM, { periodInMinutes: 60 });
   const { settings } = await getConfig();
-  if (settings.autoOpenOnStartup) openToday();
+  if (settings.autoOpenOnStartup) await openToday();
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
