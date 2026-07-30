@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Linkx — Settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <h1>Linkx</h1>
+      <p class="sub">Pick the links you want opened for each day. Click the toolbar icon to open today's.</p>
+    </header>
+
+    <section class="card">
+      <h2>Settings</h2>
+      <div class="settings-grid">
+        <label class="field">
+          <span>Open links in</span>
+          <select id="openIn">
+            <option value="newTab">New Tab</option>
+            <option value="newWindow">New Window</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Auto-open on startup</span>
+          <select id="autoOpen">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Show day badge</span>
+          <select id="showBadge">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Add a link</h2>
+      <div class="add-row">
+        <input id="add-title" class="input" type="text" placeholder="Title" />
+        <input id="add-url" class="input grow" type="text" placeholder="https://" />
+        <button id="add-btn" class="btn">Add</button>
+      </div>
+      <div id="add-error" class="error" role="alert"></div>
+    </section>
+
+    <section class="card">
+      <h2>Selected links</h2>
+      <p class="hint">Drag the handle or use the arrows to set the order tabs open in. Toggle day pills to choose when each link opens.</p>
+      <div id="links-list" class="links"></div>
+      <div id="links-empty" class="empty">No links yet. Add one above or import from your bookmarks.</div>
+    </section>
+
+    <section class="card">
+      <h2>Import from Chrome bookmarks</h2>
+      <p class="hint">Check a bookmark to add it. Unchecking removes the imported copy.</p>
+      <div id="bookmarks-tree" class="tree"></div>
+    </section>
+  </div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>
