@@ -75,6 +75,15 @@ function renderLinks() {
   config.links.forEach((link, index) => {
     list.appendChild(renderRow(link, index));
   });
+
+  syncBookmarkChecks();
+}
+
+function syncBookmarkChecks() {
+  const urls = new Set(config.links.map((l) => l.url));
+  document.querySelectorAll('#bookmarks-tree input[type="checkbox"]').forEach((cb) => {
+    cb.checked = urls.has(cb.dataset.url);
+  });
 }
 
 function renderRow(link, index) {
@@ -202,6 +211,43 @@ function removeLinkByUrl(url) {
   renderLinks();
 }
 
+// ---- Bookmark import ----
+
+function renderBookmarkNode(node) {
+  if (node.url) {
+    const label = document.createElement('label');
+    label.className = 'bm-item';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.dataset.url = node.url;
+    cb.checked = config.links.some((l) => l.url === node.url);
+    cb.addEventListener('change', () => {
+      if (cb.checked) addLinkFromBookmark(node.title, node.url);
+      else removeLinkByUrl(node.url);
+    });
+    label.append(cb, document.createTextNode(' ' + (node.title || node.url)));
+    return label;
+  }
+  const details = document.createElement('details');
+  const summary = document.createElement('summary');
+  summary.textContent = node.title || '(folder)';
+  details.appendChild(summary);
+  for (const child of node.children || []) {
+    details.appendChild(renderBookmarkNode(child));
+  }
+  return details;
+}
+
+async function renderBookmarks() {
+  const container = $('bookmarks-tree');
+  container.innerHTML = '';
+  const tree = await chrome.bookmarks.getTree();
+  const roots = (tree[0] && tree[0].children) || [];
+  for (const root of roots) {
+    container.appendChild(renderBookmarkNode(root));
+  }
+}
+
 // ---- Init ----
 
 async function init() {
@@ -212,6 +258,7 @@ async function init() {
   wireSettings();
   wireAdd();
   renderLinks();
+  renderBookmarks();
 }
 
 init();
