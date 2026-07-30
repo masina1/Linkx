@@ -126,3 +126,7 @@ select { min-width: 150px; }
 .tree summary { cursor: pointer; color: var(--text); padding: 3px 0; }
 .bm-item { display: flex; align-items: center; gap: 8px; margin-left: 20px; padding: 2px 0; color: var(--muted); }
 .bm-item input { accent-color: var(--brand); }
+
+.foot { margin-top: 28px; text-align: center; color: var(--muted); font-size: 12px; }
+.foot a { color: var(--muted); text-decoration: underline; }
+.foot a:hover { color: var(--text); }
