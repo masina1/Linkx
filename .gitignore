@@ -1,2 +1,6 @@
 node_modules/
 .superpowers/
+
+# Build artifacts (Chrome Web Store packages)
+dist/
+*.zip
