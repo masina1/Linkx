@@ -55,15 +55,45 @@ async function refreshAll(config) {
   await refreshBadge(cfg);
 }
 
+async function buildMenu(config) {
+  const cfg = config || (await getConfig());
+  await chrome.contextMenus.removeAll();
+  for (const p of cfg.profiles) {
+    chrome.contextMenus.create({
+      id: `profile:${p.id}`,
+      title: p.name,
+      type: 'radio',
+      checked: p.id === cfg.activeProfileId,
+      contexts: ['action'],
+    });
+  }
+  chrome.contextMenus.create({ id: 'sep', type: 'separator', contexts: ['action'] });
+  chrome.contextMenus.create({ id: 'manage', title: 'Manage profiles…', contexts: ['action'] });
+}
+
 chrome.action.onClicked.addListener(() => { openToday().catch(console.error); });
 
-chrome.runtime.onInstalled.addListener(() => {
-  refreshAll();
+chrome.contextMenus.onClicked.addListener(async (info) => {
+  if (info.menuItemId === 'manage') { chrome.runtime.openOptionsPage(); return; }
+  if (typeof info.menuItemId === 'string' && info.menuItemId.startsWith('profile:')) {
+    const id = info.menuItemId.slice('profile:'.length);
+    const config = await getConfig();
+    const next = setActiveProfile(config, id);
+    await setConfig(next);
+    await refreshAll(next);
+  }
+});
+
+chrome.runtime.onInstalled.addListener(async () => {
+  const config = await getConfig();
+  await refreshAll(config);
+  await buildMenu(config);
   chrome.alarms.create(DAILY_ALARM, { periodInMinutes: 60 });
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   await refreshAll();
+  await buildMenu();
   const existing = await chrome.alarms.get(DAILY_ALARM);
   if (!existing) chrome.alarms.create(DAILY_ALARM, { periodInMinutes: 60 });
   const config = await getConfig();
@@ -74,4 +104,8 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === DAILY_ALARM) refreshBadge();
 });
 
-chrome.storage.onChanged.addListener(() => { refreshAll(); });
+chrome.storage.onChanged.addListener(async () => {
+  const config = await getConfig();
+  await refreshAll(config);
+  await buildMenu(config);
+});
