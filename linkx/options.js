@@ -120,7 +120,7 @@ function renderProfileEditor() {
   // Make active
   if (p.id !== config.activeProfileId) {
     const makeActive = document.createElement('button');
-    makeActive.className = 'shortcut';
+    makeActive.className = 'make-active-btn';
     makeActive.textContent = 'Make active';
     makeActive.addEventListener('click', () => {
       config = setActiveProfile(config, p.id);

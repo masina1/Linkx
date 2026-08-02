@@ -3,6 +3,8 @@
 A tiny Manifest V3 Chrome extension that opens the bookmarks you've chosen for **today's weekday** in one click.
 
 - **One-click open** — click the toolbar icon to open every link assigned to the current day, in your chosen order.
+- **Color-coded profiles** — keep up to 5 independent profiles (e.g. Work, Gaming, Dev), each with its own links and settings. The toolbar icon and badge recolor to the active profile; **right-click the icon to switch**.
+- **Add from any page** — right-click a webpage → **Linkx** to add it to the active profile (with or without days) or switch profiles.
 - **Per-day scheduling** — assign each link to any combination of Mon–Sun, with Everyday / Weekdays / Weekends / Clear shortcuts.
 - **Bookmark import** — pick links straight from your existing Chrome bookmarks.
 - **New tab or new window** — your choice.
