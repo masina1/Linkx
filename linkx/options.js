@@ -1,4 +1,4 @@
-import { getConfig, setConfig } from './lib/storage.js';
+import { getConfig, setConfig, CONFIG_KEY } from './lib/storage.js';
 import {
   DAYS, normalizeUrl, emptyDays, everydayDays, weekdayDays, weekendDays,
   getActiveProfile, PALETTE, MAX_PROFILES,
@@ -387,5 +387,18 @@ async function init() {
 }
 
 init();
+
+chrome.storage.onChanged.addListener((changes) => {
+  const change = changes[CONFIG_KEY];
+  if (!change || !change.newValue) return;
+  const newActive = change.newValue.activeProfileId;
+  // Only react to an EXTERNAL active-profile switch; ignore our own saves
+  // (which set config.activeProfileId before writing) and link/setting edits
+  // (which never change activeProfileId).
+  if (newActive && newActive !== config.activeProfileId) {
+    config.activeProfileId = newActive;
+    renderProfiles();
+  }
+});
 
 export { config, save, reindex, renderLinks, addLinkFromBookmark, removeLinkByUrl };
