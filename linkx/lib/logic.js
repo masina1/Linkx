@@ -105,3 +105,48 @@ export function withDefaults(stored) {
   const p = makeProfile({ name: 'Default' });
   return { version: CONFIG_VERSION, activeProfileId: p.id, profiles: [p] };
 }
+
+export function getActiveProfile(config) {
+  return config.profiles.find((p) => p.id === config.activeProfileId) || config.profiles[0];
+}
+
+export function nextUnusedColor(config) {
+  const used = new Set(config.profiles.map((p) => p.color));
+  return PALETTE.find((c) => !used.has(c)) || PALETTE[0];
+}
+
+export function addProfile(config, overrides = {}) {
+  if (config.profiles.length >= MAX_PROFILES) return config;
+  const profile = makeProfile({
+    ...overrides,
+    name: overrides.name || `Profile ${config.profiles.length + 1}`,
+    color: overrides.color || nextUnusedColor(config),
+  });
+  return { ...config, profiles: [...config.profiles, profile] };
+}
+
+export function renameProfile(config, id, name) {
+  return {
+    ...config,
+    profiles: config.profiles.map((p) => (p.id === id ? { ...p, name } : p)),
+  };
+}
+
+export function setProfileColor(config, id, color) {
+  return {
+    ...config,
+    profiles: config.profiles.map((p) => (p.id === id ? { ...p, color } : p)),
+  };
+}
+
+export function deleteProfile(config, id) {
+  if (config.profiles.length <= 1) return config;
+  const profiles = config.profiles.filter((p) => p.id !== id);
+  const activeProfileId = config.activeProfileId === id ? profiles[0].id : config.activeProfileId;
+  return { ...config, activeProfileId, profiles };
+}
+
+export function setActiveProfile(config, id) {
+  if (!config.profiles.some((p) => p.id === id)) return config;
+  return { ...config, activeProfileId: id };
+}

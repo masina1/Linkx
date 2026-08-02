@@ -4,6 +4,8 @@ import {
   DAYS, DEFAULT_SETTINGS, todayIndex, dayAbbrev, linksForToday,
   normalizeUrl, emptyDays, everydayDays, weekdayDays, weekendDays, withDefaults,
   MAX_PROFILES, CONFIG_VERSION, DEFAULT_PROFILE_COLOR, PALETTE, makeProfile,
+  getActiveProfile, nextUnusedColor, addProfile, renameProfile,
+  setProfileColor, deleteProfile, setActiveProfile,
 } from '../lib/logic.js';
 
 test('DAYS is Monday-first', () => {
@@ -107,4 +109,58 @@ test('withDefaults passes through v2, clamps to 4, and repairs a bad activeProfi
   const c = withDefaults({ version: 2, activeProfileId: 'missing', profiles: many });
   assert.equal(c.profiles.length, 4);
   assert.equal(c.activeProfileId, 'p0'); // repaired to first
+});
+
+function baseConfig() {
+  return withDefaults({ version: 2, activeProfileId: 'a', profiles: [
+    { id: 'a', name: 'Default', color: PALETTE[0] },
+  ] });
+}
+
+test('getActiveProfile returns the active profile', () => {
+  assert.equal(getActiveProfile(baseConfig()).id, 'a');
+});
+
+test('nextUnusedColor skips colors already in use', () => {
+  assert.equal(nextUnusedColor(baseConfig()), PALETTE[1]);
+});
+
+test('addProfile appends with an unused color and respects MAX_PROFILES', () => {
+  let c = baseConfig();
+  c = addProfile(c, { name: 'Work' });
+  assert.equal(c.profiles.length, 2);
+  assert.equal(c.profiles[1].name, 'Work');
+  assert.equal(c.profiles[1].color, PALETTE[1]);
+  c = addProfile(c); c = addProfile(c); // now 4
+  assert.equal(c.profiles.length, 4);
+  const capped = addProfile(c); // 5th refused
+  assert.equal(capped.profiles.length, 4);
+});
+
+test('renameProfile and setProfileColor update only the target', () => {
+  let c = addProfile(baseConfig(), { id: 'b', name: 'Work' });
+  c = renameProfile(c, 'b', 'Personal');
+  c = setProfileColor(c, 'b', '#dc2626');
+  const p = c.profiles.find((x) => x.id === 'b');
+  assert.equal(p.name, 'Personal');
+  assert.equal(p.color, '#dc2626');
+  assert.equal(c.profiles.find((x) => x.id === 'a').name, 'Default'); // untouched
+});
+
+test('deleteProfile refuses the last profile', () => {
+  const c = baseConfig();
+  assert.equal(deleteProfile(c, 'a').profiles.length, 1);
+});
+
+test('deleteProfile reassigns active when the active profile is removed', () => {
+  let c = addProfile(baseConfig(), { id: 'b', name: 'Work' });
+  c = setActiveProfile(c, 'b');
+  c = deleteProfile(c, 'b');
+  assert.equal(c.profiles.length, 1);
+  assert.equal(c.activeProfileId, 'a');
+});
+
+test('setActiveProfile ignores unknown ids', () => {
+  const c = baseConfig();
+  assert.equal(setActiveProfile(c, 'nope').activeProfileId, 'a');
 });
