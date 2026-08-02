@@ -93,9 +93,21 @@ select { min-width: 150px; }
   font: inherit;
   border-radius: 6px;
   padding: 5px 6px;
-  width: 200px;
+  width: 150px;
 }
 .title-input:hover, .title-input:focus { border-color: var(--border); outline: none; }
+
+.url-input {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font: inherit;
+  border-radius: 6px;
+  padding: 5px 6px;
+  flex: 1 1 180px;
+  min-width: 140px;
+}
+.url-input:hover, .url-input:focus { border-color: var(--border); color: var(--text); outline: none; }
 
 .pills { display: flex; gap: 6px; flex-wrap: nowrap; }
 
@@ -154,3 +166,14 @@ select { min-width: 150px; }
   border: 2px solid transparent; cursor: pointer; padding: 0;
 }
 .swatch.on { border-color: var(--text); }
+
+.delete-profile-btn {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+.delete-profile-btn:hover { background: var(--danger); color: #fff; }

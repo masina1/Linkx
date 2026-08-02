@@ -133,7 +133,7 @@ function renderProfileEditor() {
   // Delete (blocked on the last profile)
   if (config.profiles.length > 1) {
     const del = document.createElement('button');
-    del.className = 'del';
+    del.className = 'delete-profile-btn';
     del.textContent = '✕ Delete profile';
     del.addEventListener('click', () => {
       config = deleteProfile(config, p.id);
@@ -243,8 +243,28 @@ function renderRow(link, index) {
   title.className = 'title-input';
   title.type = 'text';
   title.value = link.title;
+  title.title = 'Title';
   title.addEventListener('change', () => { link.title = title.value.trim() || link.url; save(); });
   row.appendChild(title);
+
+  // URL (editable input, validated on change)
+  const urlInput = document.createElement('input');
+  urlInput.className = 'url-input';
+  urlInput.type = 'text';
+  urlInput.value = link.url;
+  urlInput.title = link.url;
+  urlInput.addEventListener('change', () => {
+    const normalized = normalizeUrl(urlInput.value);
+    if (normalized) {
+      link.url = normalized;
+      urlInput.value = normalized;
+      urlInput.title = normalized;
+      save();
+    } else {
+      urlInput.value = link.url; // revert an invalid entry
+    }
+  });
+  row.appendChild(urlInput);
 
   // Day pills
   const pills = document.createElement('div');

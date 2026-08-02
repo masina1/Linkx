@@ -75,6 +75,11 @@ test('PALETTE has 20 swatches and starts with the default green', () => {
   assert.equal(DEFAULT_PROFILE_COLOR, '#16a34a');
 });
 
+test('PALETTE first five are visually distinct defaults (green, blue, red, orange, teal)', () => {
+  assert.deepEqual(PALETTE.slice(0, 5), ['#16a34a', '#2563eb', '#dc2626', '#ea580c', '#0d9488']);
+  assert.equal(new Set(PALETTE).size, PALETTE.length); // all unique
+});
+
 test('makeProfile fills defaults and keeps a provided id', () => {
   const p = makeProfile({ id: 'x', name: 'Work' });
   assert.equal(p.id, 'x');
@@ -135,6 +140,16 @@ test('addProfile appends with an unused color and respects MAX_PROFILES', () => 
   assert.equal(c.profiles.length, 4);
   const capped = addProfile(c); // 5th refused
   assert.equal(capped.profiles.length, 4);
+});
+
+test('addProfile suggests Work, Gaming, Dev by position when no name given', () => {
+  let c = baseConfig(); // 1 profile (Default)
+  c = addProfile(c);
+  assert.equal(c.profiles[1].name, 'Work');
+  c = addProfile(c);
+  assert.equal(c.profiles[2].name, 'Gaming');
+  c = addProfile(c);
+  assert.equal(c.profiles[3].name, 'Dev');
 });
 
 test('renameProfile and setProfileColor update only the target', () => {

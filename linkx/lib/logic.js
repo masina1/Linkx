@@ -12,13 +12,18 @@ export const CONFIG_VERSION = 2;
 export const MAX_PROFILES = 4;
 export const DEFAULT_PROFILE_COLOR = '#16a34a';
 
-// 20 curated, legible swatches. Index 0 is the brand green (the default).
+// 20 curated, legible swatches. The first five are ordered to be visually
+// distinct (green, blue, red, orange, teal) so auto-assigned profile colors
+// never look alike; the rest fill out the picker. Index 0 is the brand green.
 export const PALETTE = [
-  '#16a34a', '#059669', '#0d9488', '#0891b2', '#0284c7',
-  '#2563eb', '#4f46e5', '#7c3aed', '#9333ea', '#c026d3',
-  '#db2777', '#e11d48', '#dc2626', '#ea580c', '#d97706',
+  '#16a34a', '#2563eb', '#dc2626', '#ea580c', '#0d9488',
+  '#059669', '#0891b2', '#0284c7', '#4f46e5', '#7c3aed',
+  '#9333ea', '#c026d3', '#db2777', '#e11d48', '#d97706',
   '#ca8a04', '#65a30d', '#475569', '#57534e', '#52525b',
 ];
+
+// Friendly default names suggested for the 2nd, 3rd, 4th… profiles.
+export const PROFILE_NAME_SUGGESTIONS = ['Work', 'Gaming', 'Dev', 'Personal'];
 
 function genId() {
   if (globalThis.crypto && globalThis.crypto.randomUUID) return globalThis.crypto.randomUUID();
@@ -119,7 +124,9 @@ export function addProfile(config, overrides = {}) {
   if (config.profiles.length >= MAX_PROFILES) return config;
   const profile = makeProfile({
     ...overrides,
-    name: overrides.name || `Profile ${config.profiles.length + 1}`,
+    name: overrides.name
+      || PROFILE_NAME_SUGGESTIONS[config.profiles.length - 1]
+      || `Profile ${config.profiles.length + 1}`,
     color: overrides.color || nextUnusedColor(config),
   });
   return { ...config, profiles: [...config.profiles, profile] };
