@@ -130,8 +130,8 @@ function renderProfileEditor() {
     box.appendChild(makeActive);
   }
 
-  // Delete (blocked on the last profile)
-  if (config.profiles.length > 1) {
+  // Delete (hidden for the permanent default profile — the first one)
+  if (p.id !== config.profiles[0].id) {
     const del = document.createElement('button');
     del.className = 'delete-profile-btn';
     del.textContent = '✕ Delete profile';

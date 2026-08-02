@@ -169,6 +169,13 @@ test('deleteProfile refuses the last profile', () => {
   assert.equal(deleteProfile(c, 'a').profiles.length, 1);
 });
 
+test('deleteProfile refuses to delete the default (first) profile even when others exist', () => {
+  const c = addProfile(baseConfig(), { id: 'b', name: 'Work' }); // default 'a' + 'b'
+  const after = deleteProfile(c, 'a'); // 'a' is the permanent default
+  assert.equal(after.profiles.length, 2); // unchanged
+  assert.ok(after.profiles.some((p) => p.id === 'a'));
+});
+
 test('deleteProfile reassigns active when the active profile is removed', () => {
   let c = addProfile(baseConfig(), { id: 'b', name: 'Work' });
   c = setActiveProfile(c, 'b');

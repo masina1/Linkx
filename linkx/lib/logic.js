@@ -148,6 +148,7 @@ export function setProfileColor(config, id, color) {
 
 export function deleteProfile(config, id) {
   if (config.profiles.length <= 1) return config;
+  if (id === config.profiles[0].id) return config; // the default profile is permanent
   const profiles = config.profiles.filter((p) => p.id !== id);
   const activeProfileId = config.activeProfileId === id ? profiles[0].id : config.activeProfileId;
   return { ...config, activeProfileId, profiles };
