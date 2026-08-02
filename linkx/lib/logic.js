@@ -9,7 +9,7 @@ export const DEFAULT_SETTINGS = {
 };
 
 export const CONFIG_VERSION = 2;
-export const MAX_PROFILES = 4;
+export const MAX_PROFILES = 5;
 export const DEFAULT_PROFILE_COLOR = '#16a34a';
 
 // 20 curated, legible swatches. The first five are ordered to be visually
@@ -22,8 +22,8 @@ export const PALETTE = [
   '#ca8a04', '#65a30d', '#475569', '#57534e', '#52525b',
 ];
 
-// Friendly default names suggested for the 2nd, 3rd, 4th… profiles.
-export const PROFILE_NAME_SUGGESTIONS = ['Work', 'Gaming', 'Dev', 'Personal'];
+// Friendly default names suggested for the 2nd, 3rd, 4th, 5th profiles.
+export const PROFILE_NAME_SUGGESTIONS = ['Work', 'Dev', 'Gaming', 'YouTube'];
 
 function genId() {
   if (globalThis.crypto && globalThis.crypto.randomUUID) return globalThis.crypto.randomUUID();

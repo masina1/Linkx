@@ -109,10 +109,10 @@ test('withDefaults on empty input creates one empty Default profile', () => {
   assert.equal(c.activeProfileId, c.profiles[0].id);
 });
 
-test('withDefaults passes through v2, clamps to 4, and repairs a bad activeProfileId', () => {
-  const many = Array.from({ length: 6 }, (_, i) => ({ id: `p${i}`, name: `P${i}`, color: '#000000' }));
+test('withDefaults passes through v2, clamps to MAX_PROFILES, and repairs a bad activeProfileId', () => {
+  const many = Array.from({ length: 7 }, (_, i) => ({ id: `p${i}`, name: `P${i}`, color: '#000000' }));
   const c = withDefaults({ version: 2, activeProfileId: 'missing', profiles: many });
-  assert.equal(c.profiles.length, 4);
+  assert.equal(c.profiles.length, 5); // MAX_PROFILES
   assert.equal(c.activeProfileId, 'p0'); // repaired to first
 });
 
@@ -136,20 +136,22 @@ test('addProfile appends with an unused color and respects MAX_PROFILES', () => 
   assert.equal(c.profiles.length, 2);
   assert.equal(c.profiles[1].name, 'Work');
   assert.equal(c.profiles[1].color, PALETTE[1]);
-  c = addProfile(c); c = addProfile(c); // now 4
-  assert.equal(c.profiles.length, 4);
-  const capped = addProfile(c); // 5th refused
-  assert.equal(capped.profiles.length, 4);
+  c = addProfile(c); c = addProfile(c); c = addProfile(c); // now 5
+  assert.equal(c.profiles.length, 5);
+  const capped = addProfile(c); // 6th refused
+  assert.equal(capped.profiles.length, 5);
 });
 
-test('addProfile suggests Work, Gaming, Dev by position when no name given', () => {
+test('addProfile suggests Work, Dev, Gaming, YouTube by position when no name given', () => {
   let c = baseConfig(); // 1 profile (Default)
   c = addProfile(c);
   assert.equal(c.profiles[1].name, 'Work');
   c = addProfile(c);
-  assert.equal(c.profiles[2].name, 'Gaming');
+  assert.equal(c.profiles[2].name, 'Dev');
   c = addProfile(c);
-  assert.equal(c.profiles[3].name, 'Dev');
+  assert.equal(c.profiles[3].name, 'Gaming');
+  c = addProfile(c);
+  assert.equal(c.profiles[4].name, 'YouTube');
 });
 
 test('renameProfile and setProfileColor update only the target', () => {

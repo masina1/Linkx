@@ -111,9 +111,22 @@ select { min-width: 150px; }
 
 .pills { display: flex; gap: 6px; flex-wrap: nowrap; }
 
-/* On narrower screens, let the day pills wrap instead of overflowing. */
-@media (max-width: 720px) {
-  .pills { flex-wrap: wrap; }
+/* On narrower screens, reflow each link row: title + URL (and the delete
+   button) stay on the first line, the day pills drop to their own line as a
+   compact 4-per-row cluster, and the shortcuts sit on a line below — all
+   inside the card. */
+@media (max-width: 820px) {
+  .link-row { flex-wrap: wrap; }
+  .del { order: 1; }
+  .pills {
+    order: 2;
+    flex-basis: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    max-width: 340px;
+  }
+  .shortcuts { order: 3; flex-basis: 100%; margin-left: 0; }
 }
 .pill {
   background: var(--card-2);
