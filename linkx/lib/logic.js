@@ -158,3 +158,31 @@ export function setActiveProfile(config, id) {
   if (!config.profiles.some((p) => p.id === id)) return config;
   return { ...config, activeProfileId: id };
 }
+
+// Add the current page to the active profile's links (used by the page
+// right-click menu). Deduped by exact url: if the url already exists, the
+// no-days variant is a no-op and the everyday variant flips it to everyday.
+export function addPageToActiveProfile(config, { url, title, everyday }) {
+  const active = getActiveProfile(config);
+  const links = active.links;
+  const existing = links.find((l) => l.url === url);
+
+  let newLinks;
+  if (existing) {
+    if (!everyday) return config; // already present, nothing to change
+    newLinks = links.map((l) => (l.url === url ? { ...l, days: everydayDays() } : l));
+  } else {
+    newLinks = [...links, {
+      id: genId(),
+      title: title || url,
+      url,
+      days: everyday ? everydayDays() : emptyDays(),
+      order: links.length,
+    }];
+  }
+
+  return {
+    ...config,
+    profiles: config.profiles.map((p) => (p.id === active.id ? { ...p, links: newLinks } : p)),
+  };
+}

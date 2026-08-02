@@ -5,7 +5,7 @@ import {
   normalizeUrl, emptyDays, everydayDays, weekdayDays, weekendDays, withDefaults,
   MAX_PROFILES, CONFIG_VERSION, DEFAULT_PROFILE_COLOR, PALETTE, makeProfile,
   getActiveProfile, nextUnusedColor, addProfile, renameProfile,
-  setProfileColor, deleteProfile, setActiveProfile,
+  setProfileColor, deleteProfile, setActiveProfile, addPageToActiveProfile,
 } from '../lib/logic.js';
 
 test('DAYS is Monday-first', () => {
@@ -187,4 +187,46 @@ test('deleteProfile reassigns active when the active profile is removed', () => 
 test('setActiveProfile ignores unknown ids', () => {
   const c = baseConfig();
   assert.equal(setActiveProfile(c, 'nope').activeProfileId, 'a');
+});
+
+function configWithLinks(links) {
+  return withDefaults({
+    version: 2,
+    activeProfileId: 'a',
+    profiles: [{ id: 'a', name: 'Default', color: PALETTE[0], links }],
+  });
+}
+
+test('addPageToActiveProfile appends a new link with no days by default', () => {
+  const c = addPageToActiveProfile(configWithLinks([]), { url: 'https://x.com/', title: 'X', everyday: false });
+  const links = c.profiles[0].links;
+  assert.equal(links.length, 1);
+  assert.equal(links[0].url, 'https://x.com/');
+  assert.equal(links[0].title, 'X');
+  assert.deepEqual(links[0].days, emptyDays());
+  assert.equal(links[0].order, 0);
+});
+
+test('addPageToActiveProfile with everyday=true sets all days on a new link', () => {
+  const c = addPageToActiveProfile(configWithLinks([]), { url: 'https://x.com/', title: 'X', everyday: true });
+  assert.deepEqual(c.profiles[0].links[0].days, everydayDays());
+});
+
+test('addPageToActiveProfile falls back to url when no title given', () => {
+  const c = addPageToActiveProfile(configWithLinks([]), { url: 'https://x.com/', everyday: false });
+  assert.equal(c.profiles[0].links[0].title, 'https://x.com/');
+});
+
+test('addPageToActiveProfile no-days variant is a no-op when the url already exists', () => {
+  const c0 = configWithLinks([{ id: '1', url: 'https://x.com/', title: 'X', days: emptyDays(), order: 0 }]);
+  const c1 = addPageToActiveProfile(c0, { url: 'https://x.com/', title: 'X', everyday: false });
+  assert.equal(c1, c0); // unchanged reference — no duplicate
+  assert.equal(c1.profiles[0].links.length, 1);
+});
+
+test('addPageToActiveProfile everyday variant flips an existing link to everyday without duplicating', () => {
+  const c0 = configWithLinks([{ id: '1', url: 'https://x.com/', title: 'X', days: emptyDays(), order: 0 }]);
+  const c1 = addPageToActiveProfile(c0, { url: 'https://x.com/', title: 'X', everyday: true });
+  assert.equal(c1.profiles[0].links.length, 1);
+  assert.deepEqual(c1.profiles[0].links[0].days, everydayDays());
 });

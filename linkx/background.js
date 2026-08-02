@@ -1,5 +1,8 @@
 import { getConfig, setConfig } from './lib/storage.js';
-import { linksForToday, todayIndex, dayAbbrev, getActiveProfile, setActiveProfile } from './lib/logic.js';
+import {
+  linksForToday, todayIndex, dayAbbrev, normalizeUrl,
+  getActiveProfile, setActiveProfile, addPageToActiveProfile,
+} from './lib/logic.js';
 import { iconImageData } from './lib/icon.js';
 
 const DAILY_ALARM = 'linkx-daily-badge';
@@ -69,16 +72,52 @@ async function buildMenu(config) {
   }
   chrome.contextMenus.create({ id: 'sep', type: 'separator', contexts: ['action'] });
   chrome.contextMenus.create({ id: 'manage', title: 'Manage profiles…', contexts: ['action'] });
+
+  // Page right-click "Linkx" submenu: add the current page to the active
+  // profile (two variants), and switch profiles without leaving the page.
+  const active = getActiveProfile(cfg);
+  chrome.contextMenus.create({ id: 'linkx-page', title: 'Linkx', contexts: ['page'] });
+  chrome.contextMenus.create({
+    id: 'page-add-none', parentId: 'linkx-page',
+    title: `Add this page to “${active.name}”`, contexts: ['page'],
+  });
+  chrome.contextMenus.create({
+    id: 'page-add-everyday', parentId: 'linkx-page',
+    title: `Add this page to “${active.name}” (every day)`, contexts: ['page'],
+  });
+  chrome.contextMenus.create({ id: 'page-sep', parentId: 'linkx-page', type: 'separator', contexts: ['page'] });
+  chrome.contextMenus.create({ id: 'page-switch', parentId: 'linkx-page', title: 'Switch profile', contexts: ['page'] });
+  for (const p of cfg.profiles) {
+    chrome.contextMenus.create({
+      id: `page-profile:${p.id}`, parentId: 'page-switch',
+      title: p.name, type: 'radio', checked: p.id === cfg.activeProfileId, contexts: ['page'],
+    });
+  }
 }
 
 chrome.action.onClicked.addListener(() => { openToday().catch(console.error); });
 
-chrome.contextMenus.onClicked.addListener(async (info) => {
-  if (info.menuItemId === 'manage') { chrome.runtime.openOptionsPage(); return; }
-  if (typeof info.menuItemId === 'string' && info.menuItemId.startsWith('profile:')) {
-    const id = info.menuItemId.slice('profile:'.length);
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  const id = info.menuItemId;
+  if (id === 'manage') { chrome.runtime.openOptionsPage(); return; }
+
+  // Add the current page to the active profile.
+  if (id === 'page-add-none' || id === 'page-add-everyday') {
+    const url = normalizeUrl(info.pageUrl || (tab && tab.url) || '');
+    if (!url) return; // non-http(s) page (e.g. chrome://) — nothing to add
     const config = await getConfig();
-    const next = setActiveProfile(config, id);
+    const next = addPageToActiveProfile(config, {
+      url, title: tab && tab.title, everyday: id === 'page-add-everyday',
+    });
+    await setConfig(next); // storage.onChanged rebuilds the menu/visuals
+    return;
+  }
+
+  // Switch the active profile — from either the icon menu or the page menu.
+  if (typeof id === 'string' && (id.startsWith('profile:') || id.startsWith('page-profile:'))) {
+    const prefix = id.startsWith('page-profile:') ? 'page-profile:' : 'profile:';
+    const config = await getConfig();
+    const next = setActiveProfile(config, id.slice(prefix.length));
     await setConfig(next);
     await refreshAll(next);
   }
