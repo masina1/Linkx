@@ -109,7 +109,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const next = addPageToActiveProfile(config, {
       url, title: tab && tab.title, everyday: id === 'page-add-everyday',
     });
-    await setConfig(next); // storage.onChanged rebuilds the menu/visuals
+    if (next !== config) await setConfig(next); // skip the no-op write when deduped
     return;
   }
 
