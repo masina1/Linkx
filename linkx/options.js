@@ -1,6 +1,8 @@
 import { getConfig, setConfig } from './lib/storage.js';
 import {
-  DAYS, normalizeUrl, emptyDays, everydayDays, weekdayDays, weekendDays, getActiveProfile,
+  DAYS, normalizeUrl, emptyDays, everydayDays, weekdayDays, weekendDays,
+  getActiveProfile, PALETTE, MAX_PROFILES,
+  addProfile, renameProfile, setProfileColor, deleteProfile, setActiveProfile,
 } from './lib/logic.js';
 
 let config = { settings: {}, links: [] };
@@ -29,6 +31,122 @@ function renderSettings() {
   $('openIn').value = cp().settings.openIn;
   $('autoOpen').value = cp().settings.autoOpenOnStartup ? 'yes' : 'no';
   $('showBadge').value = cp().settings.showDayBadge ? 'yes' : 'no';
+}
+
+function rerender() {
+  renderProfiles();
+  renderSettings();
+  renderLinks();
+}
+
+function renderProfiles() {
+  const bar = $('profiles-bar');
+  bar.innerHTML = '';
+
+  config.profiles.forEach((p) => {
+    const chip = document.createElement('button');
+    chip.className = 'profile-chip' + (p.id === editingProfileId ? ' editing' : '');
+    chip.title = p.id === config.activeProfileId ? 'Active profile' : 'Click to edit';
+
+    const dot = document.createElement('span');
+    dot.className = 'chip-dot';
+    dot.style.background = p.color;
+    chip.appendChild(dot);
+
+    const name = document.createElement('span');
+    name.textContent = p.name;
+    chip.appendChild(name);
+
+    if (p.id === config.activeProfileId) {
+      const active = document.createElement('span');
+      active.className = 'chip-active';
+      active.textContent = '● active';
+      chip.appendChild(active);
+    }
+
+    chip.addEventListener('click', () => { editingProfileId = p.id; rerender(); });
+    bar.appendChild(chip);
+  });
+
+  const add = document.createElement('button');
+  add.className = 'btn add-profile';
+  add.textContent = '+ Add';
+  add.disabled = config.profiles.length >= MAX_PROFILES;
+  add.addEventListener('click', () => {
+    config = addProfile(config);
+    editingProfileId = config.profiles[config.profiles.length - 1].id;
+    save();
+    rerender();
+  });
+  bar.appendChild(add);
+
+  bar.appendChild(renderProfileEditor());
+}
+
+function renderProfileEditor() {
+  const box = document.createElement('div');
+  box.className = 'profile-editor';
+  const p = cp();
+
+  // Rename
+  const nameInput = document.createElement('input');
+  nameInput.className = 'input';
+  nameInput.type = 'text';
+  nameInput.value = p.name;
+  nameInput.addEventListener('change', () => {
+    config = renameProfile(config, p.id, nameInput.value.trim() || p.name);
+    save();
+    renderProfiles();
+  });
+  box.appendChild(nameInput);
+
+  // Color palette
+  const swatches = document.createElement('div');
+  swatches.className = 'swatches';
+  PALETTE.forEach((color) => {
+    const sw = document.createElement('button');
+    sw.className = 'swatch' + (color === p.color ? ' on' : '');
+    sw.style.background = color;
+    sw.title = color;
+    sw.addEventListener('click', () => {
+      config = setProfileColor(config, p.id, color);
+      save();
+      rerender();
+    });
+    swatches.appendChild(sw);
+  });
+  box.appendChild(swatches);
+
+  // Make active
+  if (p.id !== config.activeProfileId) {
+    const makeActive = document.createElement('button');
+    makeActive.className = 'shortcut';
+    makeActive.textContent = 'Make active';
+    makeActive.addEventListener('click', () => {
+      config = setActiveProfile(config, p.id);
+      save();
+      renderProfiles();
+    });
+    box.appendChild(makeActive);
+  }
+
+  // Delete (blocked on the last profile)
+  if (config.profiles.length > 1) {
+    const del = document.createElement('button');
+    del.className = 'del';
+    del.textContent = '✕ Delete profile';
+    del.addEventListener('click', () => {
+      config = deleteProfile(config, p.id);
+      if (!config.profiles.some((x) => x.id === editingProfileId)) {
+        editingProfileId = config.activeProfileId;
+      }
+      save();
+      rerender();
+    });
+    box.appendChild(del);
+  }
+
+  return box;
 }
 
 function wireSettings() {
@@ -262,10 +380,9 @@ async function init() {
   editingProfileId = config.activeProfileId;
   cp().links.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   reindex();
-  renderSettings();
   wireSettings();
   wireAdd();
-  renderLinks();
+  rerender();          // renders profiles + settings + links
   renderBookmarks();
 }
 
