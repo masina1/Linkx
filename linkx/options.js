@@ -1,9 +1,16 @@
 import { getConfig, setConfig } from './lib/storage.js';
 import {
-  DAYS, normalizeUrl, emptyDays, everydayDays, weekdayDays, weekendDays,
+  DAYS, normalizeUrl, emptyDays, everydayDays, weekdayDays, weekendDays, getActiveProfile,
 } from './lib/logic.js';
 
 let config = { settings: {}, links: [] };
+let editingProfileId = null;
+
+// The profile currently open for editing (falls back to the active one).
+function cp() {
+  return config.profiles.find((p) => p.id === editingProfileId) || getActiveProfile(config);
+}
+
 let dragFrom = null;
 
 const $ = (id) => document.getElementById(id);
@@ -13,26 +20,26 @@ async function save() {
 }
 
 function reindex() {
-  config.links.forEach((l, i) => { l.order = i; });
+  cp().links.forEach((l, i) => { l.order = i; });
 }
 
 // ---- Settings ----
 
 function renderSettings() {
-  $('openIn').value = config.settings.openIn;
-  $('autoOpen').value = config.settings.autoOpenOnStartup ? 'yes' : 'no';
-  $('showBadge').value = config.settings.showDayBadge ? 'yes' : 'no';
+  $('openIn').value = cp().settings.openIn;
+  $('autoOpen').value = cp().settings.autoOpenOnStartup ? 'yes' : 'no';
+  $('showBadge').value = cp().settings.showDayBadge ? 'yes' : 'no';
 }
 
 function wireSettings() {
   $('openIn').addEventListener('change', (e) => {
-    config.settings.openIn = e.target.value; save();
+    cp().settings.openIn = e.target.value; save();
   });
   $('autoOpen').addEventListener('change', (e) => {
-    config.settings.autoOpenOnStartup = e.target.value === 'yes'; save();
+    cp().settings.autoOpenOnStartup = e.target.value === 'yes'; save();
   });
   $('showBadge').addEventListener('change', (e) => {
-    config.settings.showDayBadge = e.target.value === 'yes'; save();
+    cp().settings.showDayBadge = e.target.value === 'yes'; save();
   });
 }
 
@@ -51,12 +58,12 @@ function onAdd() {
     return;
   }
   $('add-error').textContent = '';
-  config.links.push({
+  cp().links.push({
     id: crypto.randomUUID(),
     title: title || url,
     url,
     days: emptyDays(),
-    order: config.links.length,
+    order: cp().links.length,
   });
   reindex();
   save();
@@ -70,9 +77,9 @@ function onAdd() {
 function renderLinks() {
   const list = $('links-list');
   list.innerHTML = '';
-  $('links-empty').style.display = config.links.length ? 'none' : 'block';
+  $('links-empty').style.display = cp().links.length ? 'none' : 'block';
 
-  config.links.forEach((link, index) => {
+  cp().links.forEach((link, index) => {
     list.appendChild(renderRow(link, index));
   });
 
@@ -80,7 +87,7 @@ function renderLinks() {
 }
 
 function syncBookmarkChecks() {
-  const urls = new Set(config.links.map((l) => l.url));
+  const urls = new Set(cp().links.map((l) => l.url));
   document.querySelectorAll('#bookmarks-tree input[type="checkbox"]').forEach((cb) => {
     cb.checked = urls.has(cb.dataset.url);
   });
@@ -160,7 +167,7 @@ function renderRow(link, index) {
   del.textContent = '✕';
   del.title = 'Remove link';
   del.addEventListener('click', () => {
-    config.links = config.links.filter((l) => l.id !== link.id);
+    cp().links = cp().links.filter((l) => l.id !== link.id);
     reindex();
     save();
     renderLinks();
@@ -181,9 +188,9 @@ function renderRow(link, index) {
 }
 
 function moveLink(from, to) {
-  if (to < 0 || to >= config.links.length) return;
-  const [item] = config.links.splice(from, 1);
-  config.links.splice(to, 0, item);
+  if (to < 0 || to >= cp().links.length) return;
+  const [item] = cp().links.splice(from, 1);
+  cp().links.splice(to, 0, item);
   reindex();
   save();
   renderLinks();
@@ -192,12 +199,12 @@ function moveLink(from, to) {
 // ---- Bookmark helpers (used by Task 7) ----
 
 function addLinkFromBookmark(title, url) {
-  config.links.push({
+  cp().links.push({
     id: crypto.randomUUID(),
     title: title || url,
     url,
     days: emptyDays(),
-    order: config.links.length,
+    order: cp().links.length,
   });
   reindex();
   save();
@@ -205,7 +212,7 @@ function addLinkFromBookmark(title, url) {
 }
 
 function removeLinkByUrl(url) {
-  config.links = config.links.filter((l) => l.url !== url);
+  cp().links = cp().links.filter((l) => l.url !== url);
   reindex();
   save();
   renderLinks();
@@ -220,7 +227,7 @@ function renderBookmarkNode(node) {
     const cb = document.createElement('input');
     cb.type = 'checkbox';
     cb.dataset.url = node.url;
-    cb.checked = config.links.some((l) => l.url === node.url);
+    cb.checked = cp().links.some((l) => l.url === node.url);
     cb.addEventListener('change', () => {
       if (cb.checked) addLinkFromBookmark(node.title, node.url);
       else removeLinkByUrl(node.url);
@@ -252,7 +259,8 @@ async function renderBookmarks() {
 
 async function init() {
   config = await getConfig();
-  config.links.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  editingProfileId = config.activeProfileId;
+  cp().links.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   reindex();
   renderSettings();
   wireSettings();

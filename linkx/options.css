@@ -34,6 +34,8 @@ body {
 .card h2 { margin: 0 0 14px; font-size: 15px; }
 .hint { margin: -6px 0 14px; color: var(--muted); font-size: 12px; }
 
+.profiles-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
 .settings-grid { display: flex; gap: 18px; flex-wrap: wrap; }
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field span { color: var(--muted); font-size: 12px; }
