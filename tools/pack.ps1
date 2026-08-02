@@ -17,6 +17,7 @@ $entries = @(
   'options.js',
   'lib/logic.js',
   'lib/storage.js',
+  'lib/icon.js',
   'icons/icon16.png',
   'icons/icon48.png',
   'icons/icon128.png'

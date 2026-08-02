@@ -51,10 +51,10 @@ $z.Entries.FullName; $z.Dispose()
 
 **Name:** `Linkx`
 
-**Summary** (≤ 132 characters):
+**Summary** (≤ 132 characters — matches `manifest.json` `description`):
 
 ```
-Open the bookmarks you've chosen for today's weekday with a single click.
+Open your chosen links for today in one click. Switch color-coded profiles (work, gaming, and more), each with its own links.
 ```
 
 **Category:** `Productivity`
@@ -66,10 +66,16 @@ Open the bookmarks you've chosen for today's weekday with a single click.
 ```
 Linkx opens the links you care about for the current day of the week — in one click.
 
-Pick which bookmarks belong to Monday, Tuesday, ... Sunday (any combination), set the order they should open in, and choose whether they open in new tabs or a new window. Then just click the Linkx toolbar icon and today's links open.
+Pick which links belong to Monday, Tuesday, ... Sunday (any combination), set the order they open in, and choose whether they open in new tabs or a new window. Then just click the Linkx toolbar icon and today's links open.
+
+PROFILES
+Keep up to 5 color-coded profiles — for example Work, Gaming, and Dev — each with its own links and settings. The toolbar icon and badge recolor to show which profile is active. Right-click the toolbar icon to switch profiles, or right-click any webpage and choose Linkx to add the current page to the active profile.
 
 FEATURES
 • One-click open for the current weekday, in your chosen order
+• Up to 5 color-coded profiles, each with its own links and settings
+• Switch the active profile from the toolbar icon's right-click menu
+• Right-click any page → Linkx to add it to a profile (or switch profiles)
 • Assign each link to any days, with Everyday / Weekdays / Weekends / Clear shortcuts
 • Import directly from your existing Chrome bookmarks
 • Open in new tabs or a new window
@@ -85,7 +91,7 @@ Linkx is free and open source, licensed under CC BY-NC 4.0.
 **Graphic assets** (prepare these — **[you]**):
 
 - **Store icon:** 128×128 PNG. Linkx already ships `icons/icon128.png`; you can reuse it.
-- **Screenshots:** at least **1** (up to 5). **1280×800** or 640×400 PNG/JPEG. Load the extension, open its **Options** page with a few links configured and day pills toggled, and capture it. A second shot of the toolbar icon opening tabs is a nice-to-have.
+- **Screenshots:** at least **1** (up to 5), all **1280×800** (or 640×400) PNG/JPEG. Three ready-to-use 1280×800 shots of the profiles UI are in [`docs/screenshots/`](screenshots/): `profiles-options.png` (overview), `profiles-editor.png` (rename / color palette / make-active / delete), and `profiles-links.png` (per-day scheduling). Nice-to-have extras you can capture yourself: the toolbar icon's right-click profile switcher and the webpage right-click "Linkx" menu. (The previous listing's shots are archived in `docs/screenshots/old/`.)
 - **Small promo tile** (optional): 440×280 PNG.
 
 ---
@@ -95,19 +101,20 @@ Linkx is free and open source, licensed under CC BY-NC 4.0.
 **Single purpose** (paste):
 
 ```
-Linkx opens the bookmarks the user has chosen for the current weekday when they click the toolbar icon.
+Linkx opens the links the user has chosen for the current weekday — organized into color-coded profiles — when they click the toolbar icon.
 ```
 
 **Permission justifications** (one per requested permission):
 
-| Permission  | Justification                                                                                                                                                                                                       |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bookmarks` | Read the user's existing Chrome bookmarks to display them on the options page so the user can select which ones to add as daily links. Bookmarks are read only for display; they are never modified or transmitted. |
-| `storage`   | Save the user's link list and settings so they persist and sync across the user's own signed-in Chrome profiles.                                                                                                    |
-| `tabs`      | Open the user's selected links in new tabs or a new window when they click the toolbar icon or on startup.                                                                                                          |
-| `alarms`    | Refresh the toolbar day badge periodically so it always shows the correct current weekday.                                                                                                                          |
+| Permission     | Justification                                                                                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bookmarks`    | Read the user's existing Chrome bookmarks to display them on the options page so the user can select which ones to add as daily links. Bookmarks are read only for display; they are never modified or transmitted. |
+| `storage`      | Save the user's profiles, link lists, and settings so they persist and sync across the user's own signed-in Chrome profiles.                                                                                        |
+| `tabs`         | Open the user's selected links in new tabs or a new window when they click the toolbar icon or on startup, and read the current tab's title/URL when the user chooses "Add this page" from the right-click menu, so the saved link is named and stored correctly. |
+| `alarms`       | Refresh the toolbar day badge periodically so it always shows the correct current weekday.                                                                                                                          |
+| `contextMenus` | Add items to the toolbar icon's right-click menu and to the webpage right-click menu so the user can switch the active profile and add the current page to a profile.                                               |
 
-> **Reviewer note on** `tabs`**:** creating tabs (`chrome.tabs.create`) does **not** strictly require the `tabs` permission — that permission only grants access to sensitive tab properties (URL, title) which Linkx doesn't read. If a reviewer flags `tabs` as unnecessary, you can safely remove `"tabs"` from `manifest.json` and resubmit; the open-links feature will still work. It's currently declared for clarity.
+> **Reviewer note on** `tabs`**:** Linkx reads the active tab's title/URL only when the user explicitly invokes the "Add this page" context-menu item, in order to save that page as a link in the active profile. It also uses `chrome.tabs.create` to open links. No tab data is transmitted anywhere. (Earlier versions declared `tabs` only for `create`; as of v1.2.0 the page-menu feature genuinely reads the active tab, so `tabs` is required.)
 
 **Data usage** — declare and certify:
 
